@@ -29,7 +29,7 @@ public class GetGadgetCategoryByIdQueryHandler(IGadgetsRepositoryService reposit
 
     public async Task<BaseOutput<GetGadgetCategoryByIdQueryResponseModel?>> Handle(GetGadgetCategoryByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _repository.GetEntityByIdAsync<GadgetCategory>(request.GadgetCategoryId).ConfigureAwait(false);
+        var entity = await _repository.GetByIdAsync<GadgetCategory>(request.GadgetCategoryId).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 

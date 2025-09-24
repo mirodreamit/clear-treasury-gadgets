@@ -30,7 +30,7 @@ public class DeleteGadgetCommand(Guid GadgetId) : ContextualRequest, IRequest<Ba
 
         public async Task<BaseOutput<DeleteGadgetResponseModel>> Handle(DeleteGadgetCommand request, CancellationToken cancellationToken)
         {
-            await _repository.DeleteEntityHardAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
+            await _repository.DeleteHardAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
 
             return new BaseOutput<DeleteGadgetResponseModel>(Abstractions.Enums.OperationResult.Deleted, new DeleteGadgetResponseModel() { GadgetId = request.GadgetId });
         }

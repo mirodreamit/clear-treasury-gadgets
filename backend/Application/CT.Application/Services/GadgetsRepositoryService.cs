@@ -1,15 +1,12 @@
 ﻿using CT.Application.Interfaces;
-using CT.Domain.Entities;
 using CT.Repository;
-using CT.Repository.Abstractions.Interfaces;
-using CT.Repository.Abstractions.Services;
+using CT.Repository.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace CT.Application.Services;
 
-public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<IRepositoryService<GadgetsDbContext>> logger) : RepositoryService<GadgetsDbContext>(dbContext, logger), IGadgetsRepositoryService
+public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<RepositoryService<GadgetsDbContext>> logger) : RepositoryService<GadgetsDbContext>(dbContext, logger), IGadgetsRepositoryService
 {
     public async Task<int> DecreaseGadgetStockQuantityAsync(Guid gadgetId, CancellationToken cancellationToken)
     {

@@ -36,11 +36,11 @@ public class DeleteGadgetFullCommand(Guid gadgetId) : ContextualRequest, IReques
 
             try
             {
-                await _repository.DeleteEntitiesHardByExpressionAsync<GadgetCategory>(x => x.GadgetId == request.GadgetId).ConfigureAwait(false);
+                await _repository.DeleteWhereAsync<GadgetCategory>(x => x.GadgetId == request.GadgetId).ConfigureAwait(false);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                await _repository.DeleteEntityHardAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
+                await _repository.DeleteHardAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
                 
                 cancellationToken.ThrowIfCancellationRequested();
 

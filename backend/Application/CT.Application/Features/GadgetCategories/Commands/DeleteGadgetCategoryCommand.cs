@@ -31,7 +31,7 @@ public class DeleteGadgetCategoryCommand(Guid gadgetCategoryId) : ContextualRequ
 
         public async Task<BaseOutput<DeleteGadgetCategoryResponseModel>> Handle(DeleteGadgetCategoryCommand request, CancellationToken cancellationToken)
         {
-            await _repository.DeleteEntityHardAsync<GadgetCategory>(request.GadgetCategoryId).ConfigureAwait(false);
+            await _repository.DeleteHardAsync<GadgetCategory>(request.GadgetCategoryId).ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
 

@@ -52,7 +52,7 @@ public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) :
         {
             var entity = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description);
 
-            var res = await _repository.UpsertEntityAsync(entity).ConfigureAwait(false);
+            var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);
 
             return new BaseOutput<UpsertGadgetResponseModel>(res.ToOperationResult(), new UpsertGadgetResponseModel()
             {

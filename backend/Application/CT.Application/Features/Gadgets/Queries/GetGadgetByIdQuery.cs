@@ -27,7 +27,7 @@ public class GetGadgetByIdQueryHandler(IGadgetsRepositoryService GadgetMakerRepo
 
     public async Task<BaseOutput<GetGadgetByIdQueryResponseModel>> Handle(GetGadgetByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _repository.GetEntityByIdAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
+        var entity = await _repository.GetByIdAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 

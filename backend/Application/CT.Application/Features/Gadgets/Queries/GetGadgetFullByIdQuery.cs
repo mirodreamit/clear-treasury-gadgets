@@ -57,7 +57,7 @@ public class GetGadgetFullByIdQueryHandler(IGadgetsRepositoryService repository)
 
     public async Task<BaseOutput<GetGadgetFullByIdQueryResponseModel>> Handle(GetGadgetFullByIdQuery request, CancellationToken cancellationToken)
     {
-        var gadget = await _repository.GetEntityByIdAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
+        var gadget = await _repository.GetByIdAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -70,7 +70,7 @@ public class GetGadgetFullByIdQueryHandler(IGadgetsRepositoryService repository)
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var data = await _repository.ExecuteQueryAsync(query, pageIndex: request.PagingParameters?.PageIndex ?? 0, pageSize: request.PagingParameters?.PageSize ?? -1)
+        var data = await _repository.QueryAsync(query, pageIndex: request.PagingParameters?.PageIndex ?? 0, pageSize: request.PagingParameters?.PageSize ?? -1)
                             .ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();

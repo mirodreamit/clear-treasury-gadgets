@@ -52,7 +52,7 @@ public class UpsertGadgetCategoryCommand(Guid gadgetCategoryId, CreateGadgetCate
         {
             var entity = new GadgetCategory(request.GadgetCategoryId, request.Model.GadgetId, request.Model.CategoryId, request.Model.Ordinal);
 
-            var res = await _repository.UpsertEntityAsync(entity).ConfigureAwait(false);
+            var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
 

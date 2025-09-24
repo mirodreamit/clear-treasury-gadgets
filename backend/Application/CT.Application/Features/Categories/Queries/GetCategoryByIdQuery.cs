@@ -27,7 +27,7 @@ public class GetCategoryByIdQueryHandler(IGadgetsRepositoryService repository) :
 
     public async Task<BaseOutput<GetCategoryByIdQueryResponseModel?>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _repository.GetEntityByIdAsync<Category>(request.CategoryId).ConfigureAwait(false);
+        var entity = await _repository.GetByIdAsync<Category>(request.CategoryId).ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -45,7 +45,7 @@ public class GetGadgetsQueryHandler(IGadgetsRepositoryService repository) : IReq
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var data = await _repository.ExecuteQueryAsync(query, pageIndex: request.PagingParameters?.PageIndex ?? 0, pageSize: request.PagingParameters?.PageSize ?? -1)
+        var data = await _repository.QueryAsync(query, pageIndex: request.PagingParameters?.PageIndex ?? 0, pageSize: request.PagingParameters?.PageSize ?? -1)
                             .ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();

@@ -1,49 +1,38 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CT.Domain.Abstractions.Interfaces;
+﻿using CT.Domain.Abstractions.Interfaces;
 using CT.Repository.Abstractions.Enums;
 using CT.Repository.Abstractions.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
 
 namespace CT.Repository.Abstractions.Interfaces;
 
-public interface IRepositoryService<TDbContext> where TDbContext : DbContext
+public interface IRepository<TDbContext> where TDbContext : DbContext
 {
     TDbContext DbContext { get; }
-    Task<T?> GetEntityByIdAsync<T>(Guid id) where T : class, IBaseEntity;
 
-    Task<Guid?> GetEntityIdByExpressionAsync<T>(params Expression<Func<T, bool>>[] expressions) where T : class, IBaseEntity;
+    Task<T?> GetByIdAsync<T>(Guid id) where T : class, IBaseEntity;
+    Task<T?> GetSingleAsync<T>(params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity;
+    Task<List<T>> GetListAsync<T>(params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity;
+    Task<List<T>> GetListAsync<T, TKey>(Expression<Func<T, TKey>>? orderByAsc = null, Expression<Func<T, TKey>>? orderByDesc = null, int maxRecords = -1, params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity;
+    Task<List<T>> GetAllAsync<T>() where T : class, IBaseEntity;
+    Task<Guid?> GetIdAsync<T>(params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity;
+    Task<ExecuteQueryResponse<TResponse>> QueryAsync<TResponse>(IQueryable<TResponse> query, int pageIndex = 0, int pageSize = -1) where TResponse : class;
 
-    Task<T?> GetEntityByExpressionAsync<T>(params Expression<Func<T, bool>>[] expressions) where T : class, IBaseEntity;
+    Task<Guid> AddAsync<T>(T entity) where T : class, IBaseEntity;
+    Task AddRangeAsync<T>(List<T> entities) where T : class, IBaseEntity;
+    Task UpdateAsync<T>(T entity) where T : class, IBaseEntity;
+    Task<UpsertEntityResult> UpsertAsync<T>(T entity) where T : class, IBaseEntity;
 
-    Task<List<T>> GetEntitiesByExpressionAsync<T>(params Expression<Func<T, bool>>[] expressions) where T : class, IBaseEntity;
+    Task DeleteAsync<T>(Guid id) where T : class, IBaseEntity;
+    Task DeleteRangeAsync<T>(IEnumerable<Guid> ids) where T : class, IBaseEntity;
+    Task DeleteWhereAsync<T>(params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity;
 
-    Task<List<T>> GetEntitiesByExpressionAsync<T, TKey>(Expression<Func<T, TKey>>? orderByAscending = null, Expression<Func<T, TKey>>? orderByDescending = null, int maxRecordCount = -1, params Expression<Func<T, bool>>[] expressions) where T : class, IBaseEntity;
-
-    Task<List<T>> GetAllEntitiesAsync<T>() where T : class, IBaseEntity;
-
-    Task<ExecuteQueryResponse<TResponse>> ExecuteQueryAsync<TResponse>(IQueryable<TResponse> query, int pageIndex = 0, int pageSize = -1) where TResponse : class;
-
-    Task<Guid> InsertEntityAsync<T>(T entity) where T : class, IBaseEntity;
-
-    Task UpdateEntityAsync<T>(T entity) where T : class, IBaseEntity;
-
-    Task<UpsertEntityResult> UpsertEntityAsync<T>(T entity) where T : class, IBaseEntity;
-
-    Task DeleteEntityAsync<T>(Guid id) where T : class, IAuditableEntityWithSoftDelete, IBaseEntity;
-
-    Task DeleteEntitiesHardAsync<T>(List<Guid> ids) where T : class, IBaseEntity;
-    Task DeleteEntityHardAsync<T>(Guid id) where T : class, IBaseEntity;
-
-    Task DeleteEntityHardByExpressionAsync<T>(params Expression<Func<T, bool>>[] expressions) where T : class, IBaseEntity;
-
-    Task DeleteEntitiesHardByExpressionAsync<T>(params Expression<Func<T, bool>>[] expressions) where T : class, IBaseEntity;
-
-    Task InsertEntitiesAsync<T>(List<T> entities) where T : class, IBaseEntity;
+    Task DeleteHardAsync<T>(Guid id) where T : class, IBaseEntity;
+    Task DeleteHardRangeAsync<T>(IEnumerable<Guid> ids) where T : class, IBaseEntity;
+    Task DeleteHardWhereAsync<T>(params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity;
 
     Task<TransactionModel> BeginTransactionAsync(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted);
-
-    Task CommitTransactionAsync(TransactionModel transactionModel);
-
-    Task RollbackTransactionAsync(TransactionModel transactionModel);
+    Task CommitTransactionAsync(TransactionModel transaction);
+    Task RollbackTransactionAsync(TransactionModel transaction);
 }

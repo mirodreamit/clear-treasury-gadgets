@@ -107,21 +107,21 @@ public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel
                 gadgetCategories.Add(new GadgetCategory(Guid.NewGuid(), gadget.Id, id, i));
 
             }
-
+            
             var transactionModel = await _repository.BeginTransactionAsync();
             var transaction = (IDbContextTransaction)transactionModel.Transaction!;
 
             try
             {
-                await _repository.UpsertEntityAsync(gadget).ConfigureAwait(false);
+                await _repository.UpsertAsync(gadget).ConfigureAwait(false);
                 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                await _repository.InsertEntitiesAsync(newCategories).ConfigureAwait(false);
+                await _repository.AddRangeAsync(newCategories).ConfigureAwait(false);
                 
                 cancellationToken.ThrowIfCancellationRequested();
                 
-                await _repository.InsertEntitiesAsync(gadgetCategories).ConfigureAwait(false);
+                await _repository.AddRangeAsync(gadgetCategories).ConfigureAwait(false);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
