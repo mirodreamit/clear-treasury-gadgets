@@ -1,21 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using CT.Application.Abstractions.Interfaces;
+using CT.Application.Interfaces;
+using CT.Application.Constants;
 
-namespace CT.FunctionApi.Services;
+namespace CT.FunctionApp.Services;
 
-public class UserContextAccessor : BaseContextAccessor, IUserContextAccessor
+public class UserContextAccessor(IHttpContextAccessor httpContextAccessor, ITokenGenerator tokenGenerator) : BaseContextAccessor(httpContextAccessor, tokenGenerator), IUserContextAccessor
 {
-    public UserContextAccessor(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
-    {
-    }
-
     public string GetUserIdentifier()
     {
-        return null;
+        return GetClaimValue(CustomClaimTypes.UserIdentifier);
     }
 
     public string GetSessionId()
     {
-        return null;
+        return GetClaimValue(CustomClaimTypes.SessionId);
     }
 }

@@ -15,7 +15,7 @@ public class RepositoryService<TDbContext>(TDbContext dbContext, ILogger<Reposit
 {
     private readonly TDbContext _dbContext = dbContext;
     private readonly ILogger<RepositoryService<TDbContext>> _logger = logger;
-
+    
     public TDbContext DbContext => _dbContext;
 
     #region Query
@@ -58,7 +58,7 @@ public class RepositoryService<TDbContext>(TDbContext dbContext, ILogger<Reposit
     public async Task<Guid?> GetIdAsync<T>(params Expression<Func<T, bool>>[] predicates) where T : class, IBaseEntity
     {
         var queryable = ApplyExpressions(_dbContext.Set<T>(), predicates);
-        return await queryable.Select(x => (Guid?)x.Id).SingleOrDefaultAsync();
+        return await queryable.AsNoTracking().Select(x => (Guid?)x.Id).SingleOrDefaultAsync();
     }
 
     public async Task<ExecuteQueryResponse<TResponse>> QueryAsync<TResponse>(IQueryable<TResponse> query, int pageIndex = 0, int pageSize = -1) where TResponse : class
@@ -172,10 +172,12 @@ public class RepositoryService<TDbContext>(TDbContext dbContext, ILogger<Reposit
 
     public async Task DeleteHardAsync<T>(Guid id) where T : class, IBaseEntity
     {
-        var entity = await GetByIdAsync<T>(id) ?? throw new KeyNotFoundException($"Entity not found. [id: {id}]");
-        _dbContext.DetachLocal(entity, entity.Id);
-        _dbContext.Remove(entity);
-        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+        int affected = await _dbContext.Set<T>()
+            .Where(e => e.Id == id)
+            .ExecuteDeleteAsync();
+
+        if (affected == 0)
+            throw new KeyNotFoundException($"Entity not found. [id: {id}]");
     }
 
     public async Task DeleteHardRangeAsync<T>(IEnumerable<Guid> ids) where T : class, IBaseEntity

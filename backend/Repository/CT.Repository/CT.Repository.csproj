@@ -13,11 +13,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.24.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\CT.Domain\CT.Domain.csproj" />
     <ProjectReference Include="..\CT.Repository.Abstractions\CT.Repository.Abstractions.csproj" />
+    <ProjectReference Include="..\CT.Repository.IS\CT.Repository.IS.csproj" />
   </ItemGroup>
 
 </Project>

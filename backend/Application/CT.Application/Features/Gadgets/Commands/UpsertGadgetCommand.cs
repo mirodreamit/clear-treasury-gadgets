@@ -6,10 +6,11 @@ using CT.Domain.Entities;
 using CT.Repository.Abstractions.Enums;
 using static CT.Application.Features.Gadgets.Commands.UpsertGadgetCommand;
 using CT.Application.Extensions;
+using CT.Application.Abstractions.Interfaces;
 
 namespace CT.Application.Features.Gadgets.Commands;
 
-public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) : BaseInput<CreateGadgetRequestModel>(data), IRequest<BaseOutput<UpsertGadgetResponseModel>>
+public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) : BaseInput<CreateGadgetRequestModel>(data), IRequest<BaseOutput<UpsertGadgetResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetId { get; set; } = gadgetId;
 
@@ -42,15 +43,13 @@ public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) :
         }
     }
     
-    //TODO: create PATCH method for increasing stock
-
     public class UpsertGadgetCommandHandler(IGadgetsRepositoryService repository) : IRequestHandler<UpsertGadgetCommand, BaseOutput<UpsertGadgetResponseModel>>
     {
         private readonly IGadgetsRepositoryService _repository = repository;
 
         public async Task<BaseOutput<UpsertGadgetResponseModel>> Handle(UpsertGadgetCommand request, CancellationToken cancellationToken)
         {
-            var entity = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description);
+            var entity = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);
 

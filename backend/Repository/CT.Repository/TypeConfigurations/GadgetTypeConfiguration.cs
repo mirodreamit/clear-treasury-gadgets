@@ -13,6 +13,13 @@ public class GadgetTypeConfiguration : EntityTypeConfigurationBase<Gadget>
     {
         base.ConfigureEntity(builder);
 
+
+        // FKs
+        builder.HasOne(qq => qq.LastModifiedByUser)
+             .WithMany(q => q.Gadgets)
+             .HasForeignKey(o => o.LastModifiedByUserId); 
+
+        // indexes
         builder
             .HasIndex(p => new { p.UpdatedAt })
             .IncludeProperties(p => new { p.Name, p.CreatedAt });

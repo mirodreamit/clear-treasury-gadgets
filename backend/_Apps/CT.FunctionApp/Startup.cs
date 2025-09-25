@@ -42,7 +42,6 @@ namespace CT.FunctionApp
             
             builder.Services.AddQMApplication(dbConnectionString);
 
-            // builder.Services.AddSingleton<IOpenApiConfigurationOptions, OpenApiConfig>();
 
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
             {

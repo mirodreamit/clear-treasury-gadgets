@@ -10,7 +10,7 @@ using static CT.Application.Features.Gadgets.Commands.CreateGadgetFullCommand;
 
 namespace CT.Tests.Features.UseCases
 {
-    public class CreateGadgetWithCategoriesTest : BaseFixture
+    public class CreateGadgetWithCategoriesTests : BaseFixture
     {
         [Fact]
         public async void ShouldCreateNewCategories()
@@ -150,14 +150,14 @@ namespace CT.Tests.Features.UseCases
         {
             var q1 = new UpsertCategoryCommand(Guid.NewGuid(), new UpsertCategoryCommand.CreateCategoryRequestModel
             {
-                Name = "This is a test category 1"
+                Name = "This is a test category 1.1"
             });
 
             var q1Response = await _mediator.Send(q1);
 
             var q2 = new UpsertCategoryCommand(Guid.NewGuid(), new UpsertCategoryCommand.CreateCategoryRequestModel
             {
-                Name = "This is a test category 2"
+                Name = "This is a test category 2.1"
             });
 
             var q2Response = await _mediator.Send(q2);

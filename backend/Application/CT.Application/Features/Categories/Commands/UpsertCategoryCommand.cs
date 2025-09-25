@@ -7,10 +7,11 @@ using FluentValidation;
 using MediatR;
 using CT.Application.Extensions;
 using static CT.Application.Features.Categories.Commands.UpsertCategoryCommand;
+using CT.Application.Abstractions.Interfaces;
 
 namespace CT.Application.Features.Categories.Commands;
 
-public class UpsertCategoryCommand(Guid id, CreateCategoryRequestModel data) : BaseInput<CreateCategoryRequestModel>(data), IRequest<BaseOutput<UpsertCategoryResponseModel>>
+public class UpsertCategoryCommand(Guid id, CreateCategoryRequestModel data) : BaseInput<CreateCategoryRequestModel>(data), IRequest<BaseOutput<UpsertCategoryResponseModel>>, IAuthenticatedRequest
 {
     public Guid Id { get; set; } = id;
 
@@ -47,7 +48,7 @@ public class UpsertCategoryCommand(Guid id, CreateCategoryRequestModel data) : B
 
         public async Task<BaseOutput<UpsertCategoryResponseModel>> Handle(UpsertCategoryCommand request, CancellationToken cancellationToken)
         {
-            var entity = new Category(request.Id, request.Model.Name);
+            var entity = new Category(request.Id, request.Model.Name, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);
 

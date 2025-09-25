@@ -5,17 +5,11 @@ using CT.Application.Configuration;
 
 namespace CT.Application.Behaviors;
 
-public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class PerformanceBehavior<TRequest, TResponse>(ILogger<TRequest> logger, ApplicationConfiguration config) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    private readonly ILogger<TRequest> _logger;
-    private readonly ApplicationConfiguration _config;
-
-    public PerformanceBehavior(ILogger<TRequest> logger, ApplicationConfiguration config)
-    {
-        _logger = logger;
-        _config = config;
-    }
+    private readonly ILogger<TRequest> _logger = logger;
+    private readonly ApplicationConfiguration _config = config;
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
@@ -47,8 +41,9 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
                 if (timer.ElapsedMilliseconds > _config!.RequestProcessingConfiguration!.WarningThresholdMiliseconds)
                 {
                     var name = typeof(TRequest).Name;
-                    var msg = $"Long Running Request: [RequestName: {name}] [Elapsed Miliseconds: {timer.ElapsedMilliseconds}]";
-                    _logger.LogWarning(msg);
+                    string msg = $"Long Running Request: [RequestName: {name}] [Elapsed Miliseconds: {timer.ElapsedMilliseconds}]";
+                    
+                    _logger.LogWarning("{Message}", msg);
                 }
             }
             catch (Exception)

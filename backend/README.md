@@ -9,7 +9,8 @@ Package manager console:
 
 *** set CT.Repository as Default project in Package Manager Console   
 
-    add-migration 'CT_Init' -Context 'GadgetsDbContext' -OutputDir 'Migrations\GD\SqlServer' -startupProject 'CT.Repository.Executor'
+    add-migration 'GD_Init' -Context 'GadgetsDbContext' -OutputDir 'Migrations\GD\SqlServer' -startupProject 'CT.Repository.Executor'
+    add-migration 'IS_Init' -Context 'IsDbContext' -OutputDir 'Migrations\IdentityServer\SqlServer' -startupProject 'CT.Repository.Executor'
     
 # How to update database [sql server]
 
@@ -18,6 +19,7 @@ Generate migrations using sql server dbcontext design time options.
 *** set CT.Repository as Default project in Package Manager Console   
 
     Update-Database -args '"Server=localhost;Initial Catalog=gadgets-dev;Connection Timeout=30;Integrated Security=True;Encrypt=False"' -Context 'GadgetsDbContext' -startupProject 'CT.Repository.Executor'
+    Update-Database -args '"Server=localhost;Initial Catalog=gadgets-dev;Connection Timeout=30;Integrated Security=True;Encrypt=False"' -Context 'IsDbContext' -startupProject 'CT.Repository.Executor'
 
 # How to run the solution
     Update the database.

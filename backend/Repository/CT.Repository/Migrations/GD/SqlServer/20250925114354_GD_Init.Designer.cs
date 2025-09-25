@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CT.Repository.Migrations.GD.SqlServer
 {
     [DbContext(typeof(GadgetsDbContext))]
-    [Migration("20250923215430_CT_Init_3")]
-    partial class CT_Init_3
+    [Migration("20250925114354_GD_Init")]
+    partial class GD_Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -25,7 +25,12 @@ public static class ConfigureApplicationServices
         services.AddRepository(dbConnectionString);
 
         services.AddScoped<IGadgetsRepositoryService, GadgetsRepositoryService>();
+        services.AddScoped<IIdentityServerRepositoryService, IdentityServerRepositoryService>();
+        services.AddScoped<IIdentityServerService, IdentityServerService>();
         
+        services.AddSingleton<ITokenGenerator, TokenGenerator>();
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
         return services;
     }
 
@@ -49,6 +54,19 @@ public static class ConfigureApplicationServices
             options.UseSqlServer();
         });
 
+        services.AddDbContext<IsDbContext>(delegate (DbContextOptionsBuilder options)
+        {
+            options.UseSqlServer(dbConnectionString, delegate (SqlServerDbContextOptionsBuilder o)
+            {
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+            });
+        });
+
+        services.AddDbContextFactory<IsDbContext>(delegate (DbContextOptionsBuilder options)
+        {
+            options.UseSqlServer();
+        });
+
         return services;
     }
 
@@ -61,6 +79,7 @@ public static class ConfigureApplicationServices
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionsBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestAuthenticationBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
         mediatrAddedBehaviors?.Invoke(services);

@@ -6,10 +6,11 @@ using CT.Application.Interfaces;
 using CT.Domain.Entities;
 using static CT.Application.Features.Gadgets.Commands.CreateGadgetFullCommand;
 using CT.Application.Abstractions.Enums;
+using CT.Application.Abstractions.Interfaces;
 
 namespace CT.Application.Features.Gadgets.Commands;
 
-public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel data) : BaseInput<CreateGadgetFullRequestModel>(data), IRequest<BaseOutput<CreateGadgetFullResponseModel>>
+public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel data) : BaseInput<CreateGadgetFullRequestModel>(data), IRequest<BaseOutput<CreateGadgetFullResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetId { get; set; } = gadgetId;
 
@@ -81,7 +82,7 @@ public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel
 
         public async Task<BaseOutput<CreateGadgetFullResponseModel>> Handle(CreateGadgetFullCommand request, CancellationToken cancellationToken)
         {
-            var gadget = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description);
+            var gadget = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var newCategories = new List<Category>();
             var existingCategoryIds = new List<Guid>();
@@ -96,7 +97,7 @@ public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel
                 if (category.CategoryId is null)
                 {
                     id = Guid.NewGuid();
-                    newCategories.Add(new Category(id,category.CategoryName));
+                    newCategories.Add(new Category(id,category.CategoryName, (Guid)request.Context[Constants.ContextKeys.UserId]!));
                 }
                 else
                 {
@@ -104,7 +105,7 @@ public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel
                     existingCategoryIds.Add(id);
                 }
 
-                gadgetCategories.Add(new GadgetCategory(Guid.NewGuid(), gadget.Id, id, i));
+                gadgetCategories.Add(new GadgetCategory(Guid.NewGuid(), gadget.Id, id, i, (Guid)request.Context[Constants.ContextKeys.UserId]!));
 
             }
             

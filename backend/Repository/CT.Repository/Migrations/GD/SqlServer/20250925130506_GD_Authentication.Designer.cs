@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CT.Repository.Migrations.GD.SqlServer
 {
     [DbContext(typeof(GadgetsDbContext))]
-    [Migration("20250923214714_CT_Init")]
-    partial class CT_Init
+    [Migration("20250925130506_GD_Authentication")]
+    partial class GD_Authentication
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,16 +66,14 @@ namespace CT.Repository.Migrations.GD.SqlServer
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("LastModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
@@ -84,6 +82,8 @@ namespace CT.Repository.Migrations.GD.SqlServer
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastModifiedByUserId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -132,6 +132,38 @@ namespace CT.Repository.Migrations.GD.SqlServer
                     b.ToTable("GadgetCategory", "GD");
                 });
 
+            modelBuilder.Entity("CT.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User", "GD");
+                });
+
+            modelBuilder.Entity("CT.Domain.Entities.Gadget", b =>
+                {
+                    b.HasOne("CT.Domain.Entities.User", "LastModifiedByUser")
+                        .WithMany("Gadgets")
+                        .HasForeignKey("LastModifiedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LastModifiedByUser");
+                });
+
             modelBuilder.Entity("CT.Domain.Entities.GadgetCategory", b =>
                 {
                     b.HasOne("CT.Domain.Entities.Category", "Category")
@@ -159,6 +191,11 @@ namespace CT.Repository.Migrations.GD.SqlServer
             modelBuilder.Entity("CT.Domain.Entities.Gadget", b =>
                 {
                     b.Navigation("GadgetCategories");
+                });
+
+            modelBuilder.Entity("CT.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Gadgets");
                 });
 #pragma warning restore 612, 618
         }

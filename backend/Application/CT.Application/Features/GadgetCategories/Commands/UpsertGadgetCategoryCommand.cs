@@ -6,10 +6,11 @@ using CT.Domain.Entities;
 using CT.Repository.Abstractions.Enums;
 using static CT.Application.Features.GadgetCategories.Commands.UpsertGadgetCategoryCommand;
 using CT.Application.Extensions;
+using CT.Application.Abstractions.Interfaces;
 
 namespace CT.Application.Features.GadgetCategories.Commands;
 
-public class UpsertGadgetCategoryCommand(Guid gadgetCategoryId, CreateGadgetCategoryRequestModel data) : BaseInput<CreateGadgetCategoryRequestModel>(data), IRequest<BaseOutput<UpsertGadgetCategoryResponseModel>>
+public class UpsertGadgetCategoryCommand(Guid gadgetCategoryId, CreateGadgetCategoryRequestModel data) : BaseInput<CreateGadgetCategoryRequestModel>(data), IRequest<BaseOutput<UpsertGadgetCategoryResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetCategoryId { get; set; } = gadgetCategoryId;
 
@@ -50,7 +51,7 @@ public class UpsertGadgetCategoryCommand(Guid gadgetCategoryId, CreateGadgetCate
 
         public async Task<BaseOutput<UpsertGadgetCategoryResponseModel>> Handle(UpsertGadgetCategoryCommand request, CancellationToken cancellationToken)
         {
-            var entity = new GadgetCategory(request.GadgetCategoryId, request.Model.GadgetId, request.Model.CategoryId, request.Model.Ordinal);
+            var entity = new GadgetCategory(request.GadgetCategoryId, request.Model.GadgetId, request.Model.CategoryId, request.Model.Ordinal, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);
 

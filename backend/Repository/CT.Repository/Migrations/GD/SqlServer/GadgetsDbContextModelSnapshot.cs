@@ -32,6 +32,9 @@ namespace CT.Repository.Migrations.GD.SqlServer
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid>("LastModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -40,6 +43,8 @@ namespace CT.Repository.Migrations.GD.SqlServer
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastModifiedByUserId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -65,6 +70,9 @@ namespace CT.Repository.Migrations.GD.SqlServer
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("LastModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -76,6 +84,8 @@ namespace CT.Repository.Migrations.GD.SqlServer
                         .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastModifiedByUserId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -104,6 +114,9 @@ namespace CT.Repository.Migrations.GD.SqlServer
                     b.Property<Guid>("GadgetId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("LastModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Ordinal")
                         .HasColumnType("int");
 
@@ -114,6 +127,8 @@ namespace CT.Repository.Migrations.GD.SqlServer
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("LastModifiedByUserId");
+
                     b.HasIndex("GadgetId", "CategoryId")
                         .IsUnique();
 
@@ -122,6 +137,49 @@ namespace CT.Repository.Migrations.GD.SqlServer
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("GadgetId", "Ordinal"), new[] { "CreatedAt", "UpdatedAt", "CategoryId" });
 
                     b.ToTable("GadgetCategory", "GD");
+                });
+
+            modelBuilder.Entity("CT.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User", "GD");
+                });
+
+            modelBuilder.Entity("CT.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("CT.Domain.Entities.User", "LastModifiedByUser")
+                        .WithMany("Categories")
+                        .HasForeignKey("LastModifiedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LastModifiedByUser");
+                });
+
+            modelBuilder.Entity("CT.Domain.Entities.Gadget", b =>
+                {
+                    b.HasOne("CT.Domain.Entities.User", "LastModifiedByUser")
+                        .WithMany("Gadgets")
+                        .HasForeignKey("LastModifiedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LastModifiedByUser");
                 });
 
             modelBuilder.Entity("CT.Domain.Entities.GadgetCategory", b =>
@@ -138,9 +196,17 @@ namespace CT.Repository.Migrations.GD.SqlServer
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CT.Domain.Entities.User", "LastModifiedByUser")
+                        .WithMany("GadgetCategoriess")
+                        .HasForeignKey("LastModifiedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Category");
 
                     b.Navigation("Gadget");
+
+                    b.Navigation("LastModifiedByUser");
                 });
 
             modelBuilder.Entity("CT.Domain.Entities.Category", b =>
@@ -151,6 +217,15 @@ namespace CT.Repository.Migrations.GD.SqlServer
             modelBuilder.Entity("CT.Domain.Entities.Gadget", b =>
                 {
                     b.Navigation("GadgetCategories");
+                });
+
+            modelBuilder.Entity("CT.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("GadgetCategoriess");
+
+                    b.Navigation("Gadgets");
                 });
 #pragma warning restore 612, 618
         }

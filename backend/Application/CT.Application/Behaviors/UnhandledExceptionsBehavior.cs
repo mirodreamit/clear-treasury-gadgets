@@ -7,12 +7,10 @@ using CT.Application.Abstractions.Enums;
 
 namespace CT.Application.Behaviors;
 
-public class UnhandledExceptionsBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public class UnhandledExceptionsBehavior<TRequest, TResponse>(ILogger<TRequest> logger) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    private readonly ILogger<TRequest> _logger;
-
-    public UnhandledExceptionsBehavior(ILogger<TRequest> logger) => _logger = logger;
+    private readonly ILogger<TRequest> _logger = logger;
 
     public async Task<TResponse> Handle(
         TRequest request,
