@@ -57,7 +57,7 @@ namespace CT.FunctionApp
             Info = new OpenApiInfo
             {
                 Version = "v1",
-                Title = "Clear Treasure - Gadgets API",
+                Title = "Clear Treasury - Gadgets API",
                 Description = "API for managing gadgets in the Clear Treasure platform",
                 Contact = new OpenApiContact
                 {

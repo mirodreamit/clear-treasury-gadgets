@@ -18,7 +18,7 @@ namespace CT.Tests.FeaturesIS.UseCases
 
             await DeleteBasicUserAsync(response.Model!.UserIdentifier!);
 
-            Assert.True(true);
+            Assert.True(response.Result! == Application.Abstractions.Enums.OperationResult.Created);
         }
 
         [Fact]
