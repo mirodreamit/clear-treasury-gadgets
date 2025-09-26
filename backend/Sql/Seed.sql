@@ -50,12 +50,12 @@ from
 where
 	t.id not in (select id from IdentityServer.[UserDetail])
 
-insert into GD.[User] (id, identifier, createdat, updatedat)
+insert into GD.[User] (id, identifier, DisplayName, createdat, updatedat)
 select
 *
 from
 	(
-		select id = cast('11311362-e81a-4ca4-91c2-9d10ce8d4122' as uniqueidentifier), Identifier = 'auth|12345'
+		select id = cast('11311362-e81a-4ca4-91c2-9d10ce8d4122' as uniqueidentifier), Identifier = 'auth|12345', DisplayName = 'Seed'
 	) t
 	cross apply
 	(
@@ -87,7 +87,7 @@ select
 *
 from 
 	(
-		select id = cast('118feb77-3e7b-4f6f-ab47-1541d2355e27' as uniqueidentifier), Name = 'Flat screen TV', Description = 'It is a super machine', StockQuantity = 100, LastModifiedByUserId = '11311362-e81a-4ca4-91c2-9d10ce8d4122'
+		select id = cast('118feb77-3e7b-4f6f-ab47-1541d2355e27' as uniqueidentifier), Name = 'Flat screen TV', Description = 'It is a super machine', StockQuantity = 1, LastModifiedByUserId = '11311362-e81a-4ca4-91c2-9d10ce8d4122'
 		union all 
 		select id = cast('dca26d57-1067-42ca-a9ac-a67dc820b8b3' as uniqueidentifier), Name = 'Coolest mobile phone', Description = null, StockQuantity = 200, LastModifiedByUserId = '11311362-e81a-4ca4-91c2-9d10ce8d4122'
 	) t

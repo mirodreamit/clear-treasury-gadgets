@@ -1,4 +1,5 @@
-﻿using CT.Application.Abstractions.Models;
+﻿using CT.Application.Abstractions.Interfaces;
+using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using FluentValidation;
 using MediatR;
@@ -6,7 +7,7 @@ using static CT.Application.Features.Gadgets.Commands.IncreaseGadgetStockQuantit
 
 namespace CT.Application.Features.Gadgets.Commands;
 
-public class IncreaseGadgetStockQuantityCommand(Guid gadgetId) : IRequest<BaseOutput<IncreaseGadgetStockQuantityResponseModel>>
+public class IncreaseGadgetStockQuantityCommand(Guid gadgetId) : ContextualRequest, IRequest<BaseOutput<IncreaseGadgetStockQuantityResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetId { get; set; } = gadgetId;
 
@@ -36,7 +37,8 @@ public class IncreaseGadgetStockQuantityCommand(Guid gadgetId) : IRequest<BaseOu
             IncreaseGadgetStockQuantityCommand request,
             CancellationToken cancellationToken)
         {
-            int stockQuantity = await _repository.IncreaseGadgetStockQuantityAsync(request.GadgetId, cancellationToken).ConfigureAwait(false);
+            var userId = (Guid)request.Context[Constants.ContextKeys.UserId]!;
+            int stockQuantity = await _repository.IncreaseGadgetStockQuantityAsync(request.GadgetId, userId, cancellationToken).ConfigureAwait(false);
 
             return new BaseOutput<IncreaseGadgetStockQuantityResponseModel>(
                 Abstractions.Enums.OperationResult.Updated,

@@ -4,10 +4,11 @@ using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using CT.Domain.Entities;
 using static CT.Application.Features.Gadgets.Commands.DeleteGadgetCommand;
+using CT.Application.Abstractions.Interfaces;
 
 namespace CT.Application.Features.Gadgets.Commands;
 
-public class DeleteGadgetCommand(Guid GadgetId) : ContextualRequest, IRequest<BaseOutput<DeleteGadgetResponseModel>>
+public class DeleteGadgetCommand(Guid GadgetId) : ContextualRequest, IRequest<BaseOutput<DeleteGadgetResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetId { get; set; } = GadgetId;
 

@@ -1,14 +1,15 @@
-﻿using FluentValidation;
-using MediatR;
+﻿using CT.Application.Abstractions.Enums;
+using CT.Application.Abstractions.Interfaces;
 using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using CT.Domain.Entities;
+using FluentValidation;
+using MediatR;
 using static CT.Application.Features.GadgetCategories.Commands.DeleteGadgetCategoryCommand;
-using CT.Application.Abstractions.Enums;
 
 namespace CT.Application.Features.GadgetCategories.Commands;
 
-public class DeleteGadgetCategoryCommand(Guid gadgetCategoryId) : ContextualRequest, IRequest<BaseOutput<DeleteGadgetCategoryResponseModel>>
+public class DeleteGadgetCategoryCommand(Guid gadgetCategoryId) : ContextualRequest, IRequest<BaseOutput<DeleteGadgetCategoryResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetCategoryId { get; set; } = gadgetCategoryId;
 

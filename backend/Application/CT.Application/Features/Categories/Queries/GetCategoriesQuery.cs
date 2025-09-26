@@ -57,13 +57,13 @@ public class GetCategoriesQueryHandler(IGadgetsRepositoryService repository) : I
 
     private IQueryable<GetCategoriesQueryResponseModel> GetQuery(FilterQueryParameters? filterParameters, SortQueryParameters? sortParameters)
     {
-        var parName = filterParameters?.FirstOrDefault(x => x.FieldName == "name");
+        var parName = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("name", StringComparison.CurrentCultureIgnoreCase));
         var name = parName?.GetFilterQueryParameterDeconstructed((value) => (string?)value);
 
-        var parCreatedAt = filterParameters?.FirstOrDefault(x => x.FieldName == "createdAt");
+        var parCreatedAt = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("createdAt", StringComparison.CurrentCultureIgnoreCase));
         var createdAt = parCreatedAt?.GetFilterQueryParameterDeconstructed((value) => ((string?)value)?.ToDateOnly().ToDateTimeOffset());
 
-        var parUpdatedAt = filterParameters?.FirstOrDefault(x => x.FieldName == "updatedAt");
+        var parUpdatedAt = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("updatedAt", StringComparison.CurrentCultureIgnoreCase));
         var updatedAt = parUpdatedAt?.GetFilterQueryParameterDeconstructed((value) => ((string?)value)?.ToDateOnly().ToDateTimeOffset());
 
         var ctx = _repository.DbContext;

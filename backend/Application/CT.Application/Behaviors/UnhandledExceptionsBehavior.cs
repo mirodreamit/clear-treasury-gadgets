@@ -1,9 +1,12 @@
-﻿using System.Net;
-using Microsoft.Extensions.Logging;
-using MediatR;
-using System.Text;
+﻿using CT.Application.Abstractions.Enums;
+using CT.Application.Abstractions.Exceptions;
+using CT.Application.Abstractions.Models;
 using CT.Application.Models;
-using CT.Application.Abstractions.Enums;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System.Net;
+using System.Text;
 
 namespace CT.Application.Behaviors;
 
@@ -20,6 +23,10 @@ public class UnhandledExceptionsBehavior<TRequest, TResponse>(ILogger<TRequest> 
         try
         {
             return await next();
+        }
+        catch (UserFriendlyException friendlyException)
+        {
+            return CreateResponse(OperationResult.BadRequest, HttpStatusCode.BadRequest, friendlyException.Message);
         }
         catch (Exception ex)
         {
@@ -38,26 +45,30 @@ public class UnhandledExceptionsBehavior<TRequest, TResponse>(ILogger<TRequest> 
                 requestName, sb.ToString());
 
             var userMessage = "Something went wrong. Please try again later.";
-
-            var ctor = typeof(TResponse).GetConstructor([
-                typeof(OperationResult),
+            
+            return CreateResponse(OperationResult.InternalError, HttpStatusCode.InternalServerError, userMessage);
+        }
+    }
+    private static TResponse CreateResponse(OperationResult result, HttpStatusCode statusCode, string userMessage)
+    {
+        var ctor = typeof(TResponse).GetConstructor([
+            typeof(OperationResult),
                 typeof(string),
                 typeof(ApplicationError)
-            ]);
+        ]);
 
-            if (ctor != null)
-            {
-                return (TResponse)ctor.Invoke(
-                [
-                    OperationResult.InternalError,
-                    HttpStatusCode.InternalServerError.ToString(),
+        if (ctor != null)
+        {
+            return (TResponse)ctor.Invoke(
+            [
+                    result,
+                    statusCode.ToString(),
                     new ApplicationError(userMessage)
-                ]);
-            }
-
-            throw new InvalidOperationException(
-                $"Cannot construct {typeof(TResponse).Name}. " +
-                "Expected a constructor with (OperationResult, int, ApplicationError).");
+            ]);
         }
+
+        throw new InvalidOperationException(
+            $"Cannot construct {typeof(TResponse).Name}. " +
+            "Expected a constructor with (OperationResult, int, ApplicationError).");
     }
 }

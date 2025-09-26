@@ -49,6 +49,13 @@ public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) :
 
         public async Task<BaseOutput<UpsertGadgetResponseModel>> Handle(UpsertGadgetCommand request, CancellationToken cancellationToken)
         {
+            var existing = await _repository.GetIdAsync<Gadget>(x => x.Name.ToLower() == request.Model.Name.ToLower()).ConfigureAwait(false);
+
+            if (existing != null)
+            {
+                return new BaseOutput<UpsertGadgetResponseModel>(Abstractions.Enums.OperationResult.Conflict, $"Entity with the given key already exists. [Name = '{request.Model.Name}']", null!);
+            }
+            
             var entity = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);

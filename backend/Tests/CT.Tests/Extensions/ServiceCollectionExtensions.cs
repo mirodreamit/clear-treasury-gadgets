@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
         
         var testProjectConfig = provider.GetRequiredService<TestProjectConfiguration>();
         
-        services.AddQMApplication(testProjectConfig.CnnStr);
+        services.AddApplication(testProjectConfig.CnnStr);
         services.AddSingleton<IUserContextAccessor, UserContextAccessor>();
 
         var sp = services.BuildServiceProvider();

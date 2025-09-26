@@ -2,6 +2,6 @@
 
 public interface IUserContextAccessor
 {
-    string GetUserIdentifier();
-    string GetSessionId();
+    string? GetUserIdentifier();
+    string? GetSessionId();
 }

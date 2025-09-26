@@ -44,7 +44,7 @@ namespace CT.Tests.FeaturesIS.UseCases
 
             var response = await _mediator.Send(cmd);
 
-            var cmdRefresh = new RefreshLoginQuery(new RefreshLoginQuery.RefreshLoginQueryRequestModel(response.Model!.RefreshToken!));
+            var cmdRefresh = new RefreshLoginQuery();
 
             var responseRefresh = await _mediator.Send(cmdRefresh);
 

@@ -21,13 +21,27 @@ public class RequestAuthenticationBehaviour<TRequest, TResponse>(IUserContextAcc
         try
         {
             var userIdentifier = _userContextAccessor.GetUserIdentifier();
-            
-            var userId = await _repository.GetIdAsync<User>(x => x.Identifier == userIdentifier).ConfigureAwait(false);
-            
-            if (request is IContextualRequest ctxRequest)
+
+            if (userIdentifier == null)
             {
-                ctxRequest.Context.Add(Constants.ContextKeys.UserId, userId);
-                ctxRequest.Context.Add(Constants.ContextKeys.UserIdentifier, userIdentifier);
+                errorMessage = "UserIdentifier not found. Please check provided Bearer token.";
+            }
+            else
+            {
+                var userId = await _repository.GetIdAsync<User>(x => x.Identifier == userIdentifier).ConfigureAwait(false);
+
+                if (userId is null)
+                {
+                    errorMessage = $"User for the given key not found. [UserIdentifier: {userIdentifier}]";
+                }
+                else
+                {
+                    if (request is IContextualRequest ctxRequest)
+                    {
+                        ctxRequest.Context.Add(Constants.ContextKeys.UserId, userId);
+                        ctxRequest.Context.Add(Constants.ContextKeys.UserIdentifier, userIdentifier);
+                    }
+                }
             }
         }
         catch (Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException ex)

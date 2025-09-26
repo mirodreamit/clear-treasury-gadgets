@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "CT.FunctionApp": {
-      "commandName": "Project",
-      "commandLineArgs": "--port 7148",
-      "launchBrowser": false
-    }
-  }
-}

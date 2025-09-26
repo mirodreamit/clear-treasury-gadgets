@@ -1,12 +1,12 @@
-﻿using FluentValidation;
-using MediatR;
+﻿using CT.Application.Abstractions.Interfaces;
 using CT.Application.Abstractions.Models;
+using CT.Application.Extensions;
 using CT.Application.Interfaces;
 using CT.Domain.Entities;
-using CT.Repository.Abstractions.Enums;
+using FluentValidation;
+using MediatR;
 using static CT.Application.Features.GadgetCategories.Commands.UpsertGadgetCategoryCommand;
-using CT.Application.Extensions;
-using CT.Application.Abstractions.Interfaces;
+using static CT.Application.Features.Gadgets.Commands.UpsertGadgetCommand;
 
 namespace CT.Application.Features.GadgetCategories.Commands;
 
@@ -51,6 +51,13 @@ public class UpsertGadgetCategoryCommand(Guid gadgetCategoryId, CreateGadgetCate
 
         public async Task<BaseOutput<UpsertGadgetCategoryResponseModel>> Handle(UpsertGadgetCategoryCommand request, CancellationToken cancellationToken)
         {
+            var existing = await _repository.GetIdAsync<GadgetCategory>(x => x.GadgetId == request.Model.GadgetId && x.CategoryId == request.Model.CategoryId).ConfigureAwait(false);
+
+            if (existing != null)
+            {
+                return new BaseOutput<UpsertGadgetCategoryResponseModel>(Abstractions.Enums.OperationResult.Conflict, $"Entity with the given key already exists. [GadgetId = '{request.Model.GadgetId}'] [CategoryId = '{request.Model.CategoryId}']", null!);
+            }
+
             var entity = new GadgetCategory(request.GadgetCategoryId, request.Model.GadgetId, request.Model.CategoryId, request.Model.Ordinal, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);

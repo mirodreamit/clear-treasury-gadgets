@@ -4,7 +4,6 @@ using CT.Application.Abstractions.Extensions;
 using CT.Application.Abstractions.Models;
 using CT.Application.Abstractions.QueryParameters;
 using CT.Application.Interfaces;
-using CT.Domain.Entities;
 
 namespace CT.Application.Features.Gadgets.Queries;
 
@@ -13,9 +12,12 @@ public class GetGadgetFullByIdQueryResponseModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+    public string? Description { get; set; }
     public int StockQuantity { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public Guid LastModifiedByUserId { get; set; }
+    public string LastModifiedDisplayName { get; set; }
     public GadgetCategoryPagingResponseModel GadgetCategories { get; set; }
 }
 
@@ -57,11 +59,34 @@ public class GetGadgetFullByIdQueryHandler(IGadgetsRepositoryService repository)
 
     public async Task<BaseOutput<GetGadgetFullByIdQueryResponseModel>> Handle(GetGadgetFullByIdQuery request, CancellationToken cancellationToken)
     {
-        var gadget = await _repository.GetByIdAsync<Gadget>(request.GadgetId).ConfigureAwait(false);
+        var ctx = _repository.DbContext;
+
+        var queryGadget =
+            from g in ctx.Gadget
+            join u in ctx.User on g.LastModifiedByUserId equals u.Id
+            where
+                g.Id == request.GadgetId
+            select new 
+            {
+                g.Id,
+                g.CreatedAt,
+                g.UpdatedAt,
+                g.LastModifiedByUserId,
+                g.Name,
+                g.StockQuantity,
+                g.Description,
+                LastModifiedDisplayName = u.DisplayName
+            };
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (gadget == null)
+        var gadgetData = await _repository.QueryAsync(queryGadget);
+
+        var gadgetView = gadgetData.Records!.FirstOrDefault();
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (gadgetView == null)
         {
             return new BaseOutput<GetGadgetFullByIdQueryResponseModel>(OperationResult.NotFound, null!);
         }
@@ -78,10 +103,13 @@ public class GetGadgetFullByIdQueryHandler(IGadgetsRepositoryService repository)
         var response = new BaseOutput<GetGadgetFullByIdQueryResponseModel>(new GetGadgetFullByIdQueryResponseModel
         {
             Id = request.GadgetId,
-            Name = gadget!.Name,
-            StockQuantity = gadget!.StockQuantity,
-            CreatedAt = gadget!.CreatedAt,
-            UpdatedAt = gadget!.UpdatedAt,
+            Name = gadgetView!.Name,
+            StockQuantity = gadgetView!.StockQuantity,
+            CreatedAt = gadgetView!.CreatedAt,
+            UpdatedAt = gadgetView!.UpdatedAt,
+            Description = gadgetView!.Description,
+            LastModifiedByUserId = gadgetView!.LastModifiedByUserId,
+            LastModifiedDisplayName = gadgetView!.LastModifiedDisplayName,
             GadgetCategories = new GadgetCategoryPagingResponseModel
             { 
                 Items = data.Records!,

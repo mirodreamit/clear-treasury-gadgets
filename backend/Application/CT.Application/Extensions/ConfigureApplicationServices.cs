@@ -15,7 +15,7 @@ namespace CT.Application.Extensions;
 
 public static class ConfigureApplicationServices
 {
-    public static IServiceCollection AddQMApplication(this IServiceCollection services, string dbConnectionString, Action<IServiceCollection>? mediatrAddingBehaviors = null, Action<IServiceCollection>? mediatrAddedBehaviors = null)
+    public static IServiceCollection AddApplication(this IServiceCollection services, string dbConnectionString, Action<IServiceCollection>? mediatrAddingBehaviors = null, Action<IServiceCollection>? mediatrAddedBehaviors = null)
     {
         var applicationAssembly = Assembly.GetExecutingAssembly();
 

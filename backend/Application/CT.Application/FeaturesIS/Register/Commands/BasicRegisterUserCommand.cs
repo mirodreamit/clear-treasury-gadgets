@@ -1,6 +1,7 @@
 ﻿using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using CT.Application.Models;
+using CT.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using static CT.Application.FeaturesIS.Register.Commands.BasicRegisterUserCommand;
@@ -49,9 +50,10 @@ public class BasicRegisterUserCommand(BasicRegisterUserCommandRequestModel data)
     }
 }
 
-public class BasicRegisterUserCommandHandler(IIdentityServerService identityServerService) : IRequestHandler<BasicRegisterUserCommand, BaseOutput<BasicRegisterUserCommandResponseModel>>
+public class BasicRegisterUserCommandHandler(IIdentityServerService identityServerService, IGadgetsRepositoryService repository) : IRequestHandler<BasicRegisterUserCommand, BaseOutput<BasicRegisterUserCommandResponseModel>>
 {
     private readonly IIdentityServerService _identityServerService = identityServerService;
+    private readonly IGadgetsRepositoryService _repository = repository;
 
     public async Task<BaseOutput<BasicRegisterUserCommandResponseModel>> Handle(BasicRegisterUserCommand request, CancellationToken cancellationToken)
     {
@@ -60,12 +62,18 @@ public class BasicRegisterUserCommandHandler(IIdentityServerService identityServ
 
         if (!string.IsNullOrWhiteSpace(registerUserResponse.Message))
         {
-            
             return new BaseOutput<BasicRegisterUserCommandResponseModel>(Abstractions.Enums.OperationResult.InternalError, model)
             { 
                 Message = model.Message
             };
         }
+
+        await _repository.AddAsync(new User()
+        {
+            Id = Guid.NewGuid(),
+            DisplayName = request.Model.DisplayName,
+            Identifier = model.UserIdentifier!
+        });
 
         return new BaseOutput<BasicRegisterUserCommandResponseModel>(Abstractions.Enums.OperationResult.Created, model);
     }

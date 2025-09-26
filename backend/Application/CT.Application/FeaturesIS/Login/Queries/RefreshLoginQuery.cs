@@ -4,18 +4,12 @@ using CT.Application.Interfaces;
 using CT.Application.Models;
 using FluentValidation;
 using MediatR;
-using static CT.Application.FeaturesIS.Login.Queries.BasicLoginUserQuery;
 using static CT.Application.FeaturesIS.Login.Queries.RefreshLoginQuery;
 
 namespace CT.Application.FeaturesIS.Login.Queries;
 
-public class RefreshLoginQuery(RefreshLoginQueryRequestModel data) :  BaseInput<RefreshLoginQueryRequestModel>(data), IRequest<BaseOutput<RefreshLoginQueryResponseModel>>, IAuthenticatedRequest
+public class RefreshLoginQuery() : ContextualRequest, IRequest<BaseOutput<RefreshLoginQueryResponseModel>>, IAuthenticatedRequest
 {
-    public class RefreshLoginQueryRequestModel(string refreshToken)
-    {
-        public string RefreshToken { get; set; } = refreshToken;
-    }
-
     public class RefreshLoginQueryResponseModel : LoginUserResponse
     {
         public RefreshLoginQueryResponseModel() : base()
@@ -28,21 +22,6 @@ public class RefreshLoginQuery(RefreshLoginQueryRequestModel data) :  BaseInput<
             RefreshToken = loginUserResponse.RefreshToken;
             Token = loginUserResponse.Token;
             Message = loginUserResponse.Message;
-        }
-    }
-    public class RefreshLoginCommandValidator : AbstractValidator<RefreshLoginQuery>
-    {
-        public RefreshLoginCommandValidator()
-        {
-            RuleFor(x => x.Model).NotEmpty().SetValidator(new RefreshLoginQueryModelValidator());
-        }
-    }
-
-    public class RefreshLoginQueryModelValidator : AbstractValidator<RefreshLoginQueryRequestModel>
-    {
-        public RefreshLoginQueryModelValidator()
-        {
-            RuleFor(x => x.RefreshToken).NotEmpty();
         }
     }
 }

@@ -1,13 +1,12 @@
-﻿using CT.Application.Abstractions.Enums;
+﻿using CT.Application.Abstractions.Interfaces;
 using CT.Application.Abstractions.Models;
+using CT.Application.Extensions;
 using CT.Application.Interfaces;
 using CT.Domain.Entities;
-using CT.Repository.Abstractions.Enums;
 using FluentValidation;
 using MediatR;
-using CT.Application.Extensions;
 using static CT.Application.Features.Categories.Commands.UpsertCategoryCommand;
-using CT.Application.Abstractions.Interfaces;
+using static CT.Application.Features.Gadgets.Commands.UpsertGadgetCommand;
 
 namespace CT.Application.Features.Categories.Commands;
 
@@ -48,6 +47,13 @@ public class UpsertCategoryCommand(Guid id, CreateCategoryRequestModel data) : B
 
         public async Task<BaseOutput<UpsertCategoryResponseModel>> Handle(UpsertCategoryCommand request, CancellationToken cancellationToken)
         {
+            var existing = await _repository.GetIdAsync<Category>(x => x.Name.ToLower() == request.Model.Name.ToLower()).ConfigureAwait(false);
+
+            if (existing != null)
+            {
+                return new BaseOutput<UpsertCategoryResponseModel>(Abstractions.Enums.OperationResult.Conflict, $"Entity with the given key already exists. [Name = '{request.Model.Name}']", null!);
+            }
+
             var entity = new Category(request.Id, request.Model.Name, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);

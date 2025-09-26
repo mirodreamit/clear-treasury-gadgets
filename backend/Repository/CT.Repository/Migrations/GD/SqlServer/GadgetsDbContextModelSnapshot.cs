@@ -148,6 +148,10 @@ namespace CT.Repository.Migrations.GD.SqlServer
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Identifier")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

@@ -8,6 +8,7 @@ public enum OperationResult
     Updated,
     Deleted,
     NotFound,
+    Conflict, 
 
     BadRequest,
     Unauthorized,

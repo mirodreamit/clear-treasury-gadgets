@@ -1,14 +1,15 @@
-﻿using FluentValidation;
-using MediatR;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using CT.Application.Abstractions.Interfaces;
 using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using CT.Domain.Entities;
+using FluentValidation;
+using MediatR;
+using Microsoft.EntityFrameworkCore.Storage;
 using static CT.Application.Features.Gadgets.Commands.DeleteGadgetFullCommand;
 
 namespace CT.Application.Features.Gadgets.Commands;
 
-public class DeleteGadgetFullCommand(Guid gadgetId) : ContextualRequest, IRequest<BaseOutput<DeleteGadgetFullResponseModel>>
+public class DeleteGadgetFullCommand(Guid gadgetId) : ContextualRequest, IRequest<BaseOutput<DeleteGadgetFullResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetId { get; set; } = gadgetId;
 

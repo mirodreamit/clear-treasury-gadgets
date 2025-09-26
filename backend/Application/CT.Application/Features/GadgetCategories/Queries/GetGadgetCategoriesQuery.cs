@@ -64,22 +64,22 @@ public class GetGadgetCategoriesQueryHandler(IGadgetsRepositoryService repositor
 
     private IQueryable<GetGadgetCategoriesQueryResponseModel> GetQuery(FilterQueryParameters? filterParameters, SortQueryParameters? sortParameters)
     {
-        var parGadgetId = filterParameters?.FirstOrDefault(x => x.FieldName == "gadgetId");
+        var parGadgetId = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("gadgetId", StringComparison.CurrentCultureIgnoreCase));
         var gadgetId = parGadgetId?.GetFilterQueryParameterDeconstructed((value) => value is null ? (Guid?)null : new Guid((string)value));
 
-        var parCategoryId = filterParameters?.FirstOrDefault(x => x.FieldName == "categoryId");
+        var parCategoryId = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("categoryId", StringComparison.CurrentCultureIgnoreCase));
         var categoryId = parCategoryId?.GetFilterQueryParameterDeconstructed((value) => value is null ? (Guid?)null : new Guid((string)value));
 
-        var parOrdinal = filterParameters?.FirstOrDefault(x => x.FieldName == "ordinal");
+        var parOrdinal = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("ordinal", StringComparison.CurrentCultureIgnoreCase));
         var ordinal = parCategoryId?.GetFilterQueryParameterDeconstructed((value) => (int?)value);
 
-        var parCategoryName = filterParameters?.FirstOrDefault(x => x.FieldName == "categoryName");
+        var parCategoryName = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("categoryName", StringComparison.CurrentCultureIgnoreCase));
         var categoryName = parCategoryName?.GetFilterQueryParameterDeconstructed((value) => (string?)value);
 
-        var parCreatedAt = filterParameters?.FirstOrDefault(x => x.FieldName == "createdAt");
+        var parCreatedAt = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("createdAt", StringComparison.CurrentCultureIgnoreCase));
         var createdAt = parCreatedAt?.GetFilterQueryParameterDeconstructed((value) => ((string?)value)?.ToDateOnly().ToDateTimeOffset());
 
-        var parUpdatedAt = filterParameters?.FirstOrDefault(x => x.FieldName == "updatedAt");
+        var parUpdatedAt = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("updatedAt", StringComparison.CurrentCultureIgnoreCase));
         var updatedAt = parUpdatedAt?.GetFilterQueryParameterDeconstructed((value) => ((string?)value)?.ToDateOnly().ToDateTimeOffset());
 
         var ctx = _repository.DbContext;

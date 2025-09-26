@@ -52,11 +52,12 @@ internal class TokenGenerator(ApplicationConfiguration applicationConfiguration)
         return tokenHandler.ReadJwtToken(token);
     }
 
-    public bool ValidateToken(string token, out SecurityToken? validatedToken)
+    public bool ValidateToken(string token, out ClaimsPrincipal? principal, out SecurityToken? validatedToken)
     {
+        principal = null;
         validatedToken = null;
-        var tokenHandler = new JwtSecurityTokenHandler();
 
+        var tokenHandler = new JwtSecurityTokenHandler();
         var validationParameters = new TokenValidationParameters
         {
             ValidateLifetime = true,
@@ -69,7 +70,7 @@ internal class TokenGenerator(ApplicationConfiguration applicationConfiguration)
 
         try
         {
-            tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+            principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
             return true;
         }
         catch
@@ -77,6 +78,7 @@ internal class TokenGenerator(ApplicationConfiguration applicationConfiguration)
             return false;
         }
     }
+
 
     private string CreateToken(List<Claim> claims, DateTime expires)
     {

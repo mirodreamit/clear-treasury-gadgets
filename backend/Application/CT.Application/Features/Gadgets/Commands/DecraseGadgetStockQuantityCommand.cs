@@ -1,4 +1,5 @@
-﻿using CT.Application.Abstractions.Models;
+﻿using CT.Application.Abstractions.Interfaces;
+using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using FluentValidation;
 using MediatR;
@@ -6,7 +7,7 @@ using static CT.Application.Features.Gadgets.Commands.DecreaseGadgetStockQuantit
 
 namespace CT.Application.Features.Gadgets.Commands;
 
-public class DecreaseGadgetStockQuantityCommand(Guid gadgetId) : IRequest<BaseOutput<DecreaseGadgetStockQuantityResponseModel>>
+public class DecreaseGadgetStockQuantityCommand(Guid gadgetId) : ContextualRequest, IRequest<BaseOutput<DecreaseGadgetStockQuantityResponseModel>>, IAuthenticatedRequest
 {
     public Guid GadgetId { get; set; } = gadgetId;
 
@@ -37,7 +38,8 @@ public class DecreaseGadgetStockQuantityCommand(Guid gadgetId) : IRequest<BaseOu
             DecreaseGadgetStockQuantityCommand request,
             CancellationToken cancellationToken)
         {
-            int stockQuantity = await _repository.DecreaseGadgetStockQuantityAsync(request.GadgetId, cancellationToken).ConfigureAwait(false);
+            var userId = (Guid)request.Context[Constants.ContextKeys.UserId]!;
+            int stockQuantity = await _repository.DecreaseGadgetStockQuantityAsync(request.GadgetId, userId, cancellationToken).ConfigureAwait(false);
 
             return new BaseOutput<DecreaseGadgetStockQuantityResponseModel>(
                 Abstractions.Enums.OperationResult.Updated,
