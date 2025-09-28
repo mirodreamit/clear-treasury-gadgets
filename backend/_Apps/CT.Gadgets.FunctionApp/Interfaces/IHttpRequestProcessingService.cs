@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CT.Application.Abstractions.Interfaces;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using CT.Application.Abstractions.Interfaces;
-using System;
 
 namespace CT.Gadgets.FunctionApp.Interfaces;
 
 public interface IHttpRequestProcessingService
 {
-    Task<IActionResult> ProcessHttpRequestAsync(Func<Task<IBaseOutput>> f, ILogger log);
+    Task<HttpResponseData> ProcessHttpRequestAsync( 
+        HttpRequestData req,
+        Func<Task<IBaseOutput>> f,
+        ILogger log);
 }

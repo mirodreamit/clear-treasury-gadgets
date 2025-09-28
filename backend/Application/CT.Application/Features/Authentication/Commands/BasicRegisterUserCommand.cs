@@ -4,9 +4,9 @@ using CT.Application.Models;
 using CT.Domain.Entities;
 using FluentValidation;
 using MediatR;
-using static CT.Application.FeaturesIS.Register.Commands.BasicRegisterUserCommand;
+using static CT.Application.Features.Authentication.Commands.BasicRegisterUserCommand;
 
-namespace CT.Application.FeaturesIS.Register.Commands;
+namespace CT.Application.Features.Authentication.Commands;
 
 public class BasicRegisterUserCommand(BasicRegisterUserCommandRequestModel data) : BaseInput<BasicRegisterUserCommandRequestModel>(data), IRequest<BaseOutput<BasicRegisterUserCommandResponseModel>>
 {

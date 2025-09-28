@@ -1,8 +1,10 @@
-﻿using CT.Application.Abstractions.Interfaces;
+﻿using CT.Application.Abstractions.Enums;
+using CT.Application.Abstractions.Interfaces;
 using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using FluentValidation;
 using MediatR;
+using static CT.Application.Features.Gadgets.Commands.DecreaseGadgetStockQuantityCommand;
 using static CT.Application.Features.Gadgets.Commands.IncreaseGadgetStockQuantityCommand;
 
 namespace CT.Application.Features.Gadgets.Commands;
@@ -24,28 +26,32 @@ public class IncreaseGadgetStockQuantityCommand(Guid gadgetId) : ContextualReque
         }
     }
 
-    public class IncreaseGadgetStockQuantityCommandHandler : IRequestHandler<IncreaseGadgetStockQuantityCommand, BaseOutput<IncreaseGadgetStockQuantityResponseModel>>
+    public class IncreaseGadgetStockQuantityCommandHandler(IGadgetsRepositoryService repository) : IRequestHandler<IncreaseGadgetStockQuantityCommand, BaseOutput<IncreaseGadgetStockQuantityResponseModel>>
     {
-        private readonly IGadgetsRepositoryService _repository;
-
-        public IncreaseGadgetStockQuantityCommandHandler(IGadgetsRepositoryService repository)
-        {
-            _repository = repository;
-        }
+        private readonly IGadgetsRepositoryService _repository = repository;
 
         public async Task<BaseOutput<IncreaseGadgetStockQuantityResponseModel>> Handle(
             IncreaseGadgetStockQuantityCommand request,
             CancellationToken cancellationToken)
         {
             var userId = (Guid)request.Context[Constants.ContextKeys.UserId]!;
-            int stockQuantity = await _repository.IncreaseGadgetStockQuantityAsync(request.GadgetId, userId, cancellationToken).ConfigureAwait(false);
+            var result = await _repository.IncreaseGadgetStockQuantityAsync(request.GadgetId, userId, cancellationToken).ConfigureAwait(false);
+
+            var responseModel = new IncreaseGadgetStockQuantityResponseModel
+            {
+                StockQuantity = result.StockQuantity
+            };
+
+            if (!result.Success)
+            {
+                return new BaseOutput<IncreaseGadgetStockQuantityResponseModel>(
+                    OperationResult.BadRequest,
+                    responseModel);
+            }
 
             return new BaseOutput<IncreaseGadgetStockQuantityResponseModel>(
-                Abstractions.Enums.OperationResult.Updated,
-                new IncreaseGadgetStockQuantityResponseModel
-                {
-                    StockQuantity = stockQuantity
-                });
+                OperationResult.Updated,
+                responseModel);
         }
     }
 }

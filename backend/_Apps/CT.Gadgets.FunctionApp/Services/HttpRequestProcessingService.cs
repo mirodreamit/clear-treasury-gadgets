@@ -1,10 +1,9 @@
 ﻿using CT.Application.Abstractions.Enums;
-using CT.Application.Abstractions.Exceptions;
 using CT.Application.Abstractions.Interfaces;
 using CT.Application.Abstractions.Models;
 using CT.Application.Models;
 using CT.Gadgets.FunctionApp.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -16,15 +15,15 @@ public class HttpRequestProcessingService : IHttpRequestProcessingService
 {
     private static readonly JsonSerializerSettings JsonSettings = new()
     {
-        Converters = 
-        { 
-            new StringEnumConverter() 
-        },
+        Converters = { new StringEnumConverter() },
         NullValueHandling = NullValueHandling.Ignore,
         Formatting = Formatting.None
     };
-
-    public async Task<IActionResult> ProcessHttpRequestAsync(Func<Task<IBaseOutput>> f, ILogger log)
+    
+    public async Task<HttpResponseData> ProcessHttpRequestAsync( 
+        HttpRequestData req,
+        Func<Task<IBaseOutput>> f,
+        ILogger log)
     {
         try
         {
@@ -32,34 +31,41 @@ public class HttpRequestProcessingService : IHttpRequestProcessingService
 
             return response.Result switch
             {
-                OperationResult.InternalError => CreateErrorResult(response, log),
-                OperationResult.BadRequest => CreateErrorResult(response, log),
-                OperationResult.Unauthorized => CreateErrorResult(response, log),
-                OperationResult.Forbidden => CreateErrorResult(response, log),
-                OperationResult.NotFound => CreateErrorResult(response, log),
-                OperationResult.Conflict => CreateErrorResult(response, log),
-                _ => CreateJsonResult(response, GetHttpStatusCode(response.Result))
+                OperationResult.InternalError => await CreateErrorResult(req, response, log),
+                OperationResult.BadRequest => await CreateErrorResult(req, response, log),
+                OperationResult.Unauthorized => await CreateErrorResult(req, response, log),
+                OperationResult.Forbidden => await CreateErrorResult(req, response, log),
+                OperationResult.NotFound => await CreateErrorResult(req, response, log),
+                OperationResult.Conflict => await CreateErrorResult(req, response, log),
+                _ => await CreateJsonResult(req, response, GetHttpStatusCode(response.Result))
             };
         }
         catch (JsonSerializationException ex)
         {
-            return CreateErrorResult(new BaseOutput<string>(OperationResult.BadRequest, $"JsonFormat error. [{ex.Message}]", ex), log);
+            return await CreateErrorResult(req,
+                new BaseOutput<string>(OperationResult.BadRequest, $"JsonFormat error. [{ex.Message}]", ex),
+                log);
         }
         catch (JsonReaderException ex)
         {
-            return CreateErrorResult(new BaseOutput<string>(OperationResult.BadRequest, $"JsonFormat error. [{ex.Message}]", ex), log);
+            return await CreateErrorResult(req,
+                new BaseOutput<string>(OperationResult.BadRequest, $"JsonFormat error. [{ex.Message}]", ex),
+                log);
         }
         catch (Exception ex)
         {
             log.LogError(ex, "Unhandled exception occurred");
-            
-            var response = new BaseOutput<string>(OperationResult.InternalError, $"Unhandled error. [{ex.Message}]", new ApplicationError(ex));
 
-            return CreateErrorResult(response, log);
+            var response = new BaseOutput<string>(
+                OperationResult.InternalError,
+                $"Unhandled error. [{ex.Message}]",
+                new ApplicationError(ex));
+
+            return await CreateErrorResult(req, response, log);
         }
     }
 
-    private static ContentResult CreateErrorResult(IBaseOutput response, ILogger log)
+    private static async Task<HttpResponseData> CreateErrorResult(HttpRequestData req, IBaseOutput response, ILogger log)
     {
         string message = response.Error is IError error
             ? error.GetUserFriendlyMessage()
@@ -69,19 +75,18 @@ public class HttpRequestProcessingService : IHttpRequestProcessingService
 
         var res = new BaseOutput<IBaseOutput>(response.Result, null!, message);
 
-        return CreateJsonResult(res, GetHttpStatusCode(response.Result));
+        return await CreateJsonResult(req, res, GetHttpStatusCode(response.Result));
     }
 
-    private static ContentResult CreateJsonResult(object obj, int statusCode)
+    private static async Task<HttpResponseData> CreateJsonResult(HttpRequestData req, object obj, int statusCode)
     {
         var json = JsonConvert.SerializeObject(obj, JsonSettings);
 
-        return new ContentResult
-        {
-            Content = json,
-            ContentType = "application/json",
-            StatusCode = statusCode
-        };
+        var httpResponse = req.CreateResponse((HttpStatusCode)statusCode);
+        httpResponse.Headers.Add("Content-Type", "application/json");
+        await httpResponse.WriteStringAsync(json);
+
+        return httpResponse;
     }
 
     private static int GetHttpStatusCode(OperationResult result)

@@ -2,11 +2,10 @@
 using CT.Application.Abstractions.Models;
 using CT.Application.Interfaces;
 using CT.Application.Models;
-using FluentValidation;
 using MediatR;
-using static CT.Application.FeaturesIS.Login.Queries.RefreshLoginQuery;
+using static CT.Application.Features.Authentication.Queries.RefreshLoginQuery;
 
-namespace CT.Application.FeaturesIS.Login.Queries;
+namespace CT.Application.Features.Authentication.Queries;
 
 public class RefreshLoginQuery() : ContextualRequest, IRequest<BaseOutput<RefreshLoginQueryResponseModel>>, IAuthenticatedRequest
 {

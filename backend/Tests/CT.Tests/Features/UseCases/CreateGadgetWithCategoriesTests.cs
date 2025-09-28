@@ -13,6 +13,19 @@ namespace CT.Tests.Features.UseCases
     public class CreateGadgetWithCategoriesTests : BaseFixture
     {
         [Fact]
+        public async void ShouldFailCreatingCategoryWithNoName()
+        {
+            var cmd = new UpsertCategoryCommand(Guid.NewGuid(), new UpsertCategoryCommand.CreateCategoryRequestModel
+            {
+                
+            });
+
+            var res = await _mediator.Send(cmd);
+
+            Assert.True(res.Result == OperationResult.BadRequest);
+        }
+
+        [Fact]
         public async void ShouldCreateNewCategories()
         {
             var qIds = await CreateTwoCategoriesAsync();
@@ -57,7 +70,7 @@ namespace CT.Tests.Features.UseCases
                 GadgetId = qq.GadgetId
             });
 
-            await _mediator .Send(updateGCCmd); 
+            var t = await _mediator .Send(updateGCCmd); 
 
             var gadgetResponse2 = await _mediator.Send(gadgetQuery);
             var gadget2 = gadgetResponse2.Model!;

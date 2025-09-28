@@ -1,5 +1,5 @@
-using CT.Application.FeaturesIS.Login.Queries;
-using CT.Application.FeaturesIS.Register.Commands;
+using CT.Application.Features.Authentication.Commands;
+using CT.Application.Features.Authentication.Queries;
 using CT.Application.Interfaces;
 using CT.Domain.IdentityServer;
 using CT.Tests.Fixtures;

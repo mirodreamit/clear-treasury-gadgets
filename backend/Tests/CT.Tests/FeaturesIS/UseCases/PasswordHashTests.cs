@@ -1,7 +1,4 @@
-using CT.Application.FeaturesIS.Login.Queries;
-using CT.Application.FeaturesIS.Register.Commands;
 using CT.Application.Interfaces;
-using CT.Domain.IdentityServer;
 using CT.Tests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 

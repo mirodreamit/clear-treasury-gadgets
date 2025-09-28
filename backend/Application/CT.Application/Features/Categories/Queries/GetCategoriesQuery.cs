@@ -8,6 +8,7 @@ namespace CT.Application.Features.Categories.Queries;
 
 public class GetCategoriesQueryResponseModel
 {
+    
     public GetCategoriesQueryResponseModel()
     { 
     }

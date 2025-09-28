@@ -3,9 +3,9 @@ using CT.Application.Interfaces;
 using CT.Application.Models;
 using FluentValidation;
 using MediatR;
-using static CT.Application.FeaturesIS.Login.Queries.BasicLoginUserQuery;
+using static CT.Application.Features.Authentication.Queries.BasicLoginUserQuery;
 
-namespace CT.Application.FeaturesIS.Login.Queries;
+namespace CT.Application.Features.Authentication.Queries;
 
 public class BasicLoginUserQuery(BasicLoginUserQueryRequestModel data) : BaseInput<BasicLoginUserQueryRequestModel>(data), IRequest<BaseOutput<BasicLoginUserQueryResponseModel>>
 {

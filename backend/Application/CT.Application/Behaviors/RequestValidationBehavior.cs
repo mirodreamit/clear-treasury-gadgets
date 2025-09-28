@@ -1,16 +1,20 @@
-﻿using System.Net;
+﻿using CT.Application.Abstractions.Enums;
+using CT.Application.Abstractions.Factories;
+using CT.Application.Abstractions.Interfaces;
 using CT.Application.Models;
 using FluentValidation;
 using MediatR;
+using System.Net;
 
 namespace CT.Application.Behaviors;
 
 public class RequestValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
+    where TResponse : IBaseOutput
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators = validators;
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken) 
     {
         var context = new ValidationContext<TRequest>(request);
 
@@ -46,11 +50,7 @@ public class RequestValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
             }
             string requestName = typeof(TRequest).Name;
 
-            res = (TResponse)Activator.CreateInstance(
-                typeof(TResponse)!,
-                ((int)HttpStatusCode.BadRequest).ToString(),
-                "Validation Error",
-                new ValidationError(requestName, failureMessages))!;
+            res = BaseOutputFactory.CreateError<TResponse>(OperationResult.BadRequest, "Validation Error", new ValidationError(requestName, failureMessages));
         }
         else
         {

@@ -1,17 +1,21 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Functions.Worker.Http;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Net;
+using System.Web;
 
 namespace CT.Gadgets.FunctionApp.Extensions;
 
 public static class HttpRequestExtensions
 {
-    public static T? GetQueryParameter<T>(this HttpRequest req, string parameterName)
+    public static T? GetQueryParameter<T>(this HttpRequestData req, string parameterName)
     {
-        if (!req.Query.TryGetValue(parameterName, out var valueStr) || string.IsNullOrWhiteSpace(valueStr))
-            return default;
+        var queryParams = HttpUtility.ParseQueryString(req.Url.Query);
+        var value = queryParams[parameterName];
 
-        var value = valueStr.ToString();
+        if (string.IsNullOrWhiteSpace(value))
+            return default;
 
         if (typeof(T) == typeof(string))
             return (T)(object)value;
@@ -22,10 +26,11 @@ public static class HttpRequestExtensions
         if (typeof(T) == typeof(double) && double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var doubleVal))
             return (T)(object)doubleVal;
 
+        // fallback to JSON deserialization for complex types
         return JsonConvert.DeserializeObject<T>(value, new JsonSerializerSettings());
     }
 
-    public static async Task<T> GetModelFromRequestBodyAsync<T>(this HttpRequest req)
+    public static async Task<T> GetModelFromRequestBodyAsync<T>(this HttpRequestData req)
     {
         using var sr = new StreamReader(req.Body);
 

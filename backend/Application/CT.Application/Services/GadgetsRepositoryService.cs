@@ -1,5 +1,4 @@
-﻿using CT.Application.Abstractions.Exceptions;
-using CT.Application.Interfaces;
+﻿using CT.Application.Interfaces;
 using CT.Repository;
 using CT.Repository.Services;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +8,12 @@ namespace CT.Application.Services;
 
 public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<RepositoryService<GadgetsDbContext>> logger) : RepositoryService<GadgetsDbContext>(dbContext, logger), IGadgetsRepositoryService
 {
-    public async Task<int> DecreaseGadgetStockQuantityAsync(Guid gadgetId, Guid userId, CancellationToken cancellationToken)
+    public async Task<(bool Success, string? ErrorMessage, int StockQuantity)> DecreaseGadgetStockQuantityAsync(Guid gadgetId, Guid userId, CancellationToken cancellationToken)
     {
         return await ChangeGadgetStockQuantityAsync(gadgetId, userId, -1, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<int> IncreaseGadgetStockQuantityAsync(Guid gadgetId, Guid userId, CancellationToken cancellationToken)
+    public async Task<(bool Success, string? ErrorMessage, int StockQuantity)> IncreaseGadgetStockQuantityAsync(Guid gadgetId, Guid userId, CancellationToken cancellationToken)
     {
         return await ChangeGadgetStockQuantityAsync(gadgetId, userId, 1, cancellationToken).ConfigureAwait(false);
     }
@@ -23,7 +22,7 @@ public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<Reposi
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     #region private methods
-    private async Task<int> ChangeGadgetStockQuantityAsync(Guid gadgetId, Guid userId, int delta, CancellationToken cancellationToken)
+    private async Task<(bool Success, string? ErrorMessage, int StockQuantity)> ChangeGadgetStockQuantityAsync(Guid gadgetId, Guid userId, int delta, CancellationToken cancellationToken)
     {
         await _semaphore.WaitAsync(cancellationToken);
 
@@ -34,32 +33,36 @@ public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<Reposi
             var stockQuantity = await ctx.Gadget
                 .Where(g => g.Id == gadgetId)
                 .Select(g => g.StockQuantity)
-                .FirstAsync(cancellationToken).ConfigureAwait(false);
+                .FirstAsync(cancellationToken)
+                .ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            stockQuantity += delta;
-
-            if (stockQuantity < 0)
+            var newStockQuantity = stockQuantity + delta;
+            
+            if (newStockQuantity < 0)
             {
-                throw new UserFriendlyException("Stock quantity cannot be less than zero.");
+                return (false, "Stock quantity cannot be less than zero.", stockQuantity);
             }
 
             await ctx.Gadget
                 .Where(g => g.Id == gadgetId)
                 .ExecuteUpdateAsync(g => g
-                        .SetProperty(x => x.StockQuantity, x => stockQuantity)
-                        .SetProperty(x => x.LastModifiedByUserId, x => userId), cancellationToken: cancellationToken).ConfigureAwait(false);
+                    .SetProperty(x => x.StockQuantity, x => newStockQuantity)
+                    .SetProperty(x => x.LastModifiedByUserId, x => userId),
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            return stockQuantity;
+            return (true, null, newStockQuantity);
         }
         finally
         {
             _semaphore.Release();
         }
     }
+
 
     #endregion
 }

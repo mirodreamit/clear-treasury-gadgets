@@ -8,7 +8,14 @@ public class UserContextAccessor(HttpRequestContextAccessor httpContextAccessor,
 {
     public string? GetUserIdentifier()
     {
-        return GetClaimValueFromBearerToken(CustomClaimTypes.UserIdentifier);
+        var userIdentifier = GetClaimValueFromBearerToken(CustomClaimTypes.UserIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userIdentifier))
+        {
+            userIdentifier ??= GetUserIdentifierFromCookie();
+        }
+        
+        return userIdentifier;
     }
 
     public string? GetSessionId()
