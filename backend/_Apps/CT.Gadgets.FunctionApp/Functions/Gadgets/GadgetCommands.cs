@@ -4,8 +4,8 @@ using CT.Gadgets.FunctionApp.Extensions;
 using CT.Gadgets.FunctionApp.Helpers.OpenApiParameterAttributes;
 using CT.Gadgets.FunctionApp.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -30,6 +30,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-delete")]
     [OpenApiOperation(operationId: $"{Tag}-delete", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<DeleteGadgetResponseModel>))]
@@ -53,6 +54,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-delete-full")]
     [OpenApiOperation(operationId: $"{Tag}-delete-full", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<DeleteGadgetFullResponseModel>))]
@@ -75,6 +77,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-create")]
     [OpenApiOperation(operationId: $"{Tag}-create", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [OpenApiRequestBodyType(typeof(CreateGadgetRequestModel), true)]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<UpsertGadgetResponseModel>))]
@@ -98,6 +101,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-create-full")]
     [OpenApiOperation(operationId: $"{Tag}-create-full", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [OpenApiRequestBodyType(typeof(CreateGadgetFullRequestModel), true)]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<CreateGadgetFullResponseModel>))]
@@ -121,6 +125,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-update")]
     [OpenApiOperation(operationId: $"{Tag}-update", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OpenApiRequestBodyType(typeof(CreateGadgetRequestModel), true)]
@@ -146,6 +151,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-increase-stock-by-one")]
     [OpenApiOperation(operationId: $"{Tag}-increase-stock-by-one", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<UpsertGadgetResponseModel>))]
@@ -168,6 +174,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     [EnableCors]
     [Function($"{Tag}-decrease-stock-by-one")]
     [OpenApiOperation(operationId: $"{Tag}-decrease-stock-by-one", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<UpsertGadgetResponseModel>))]

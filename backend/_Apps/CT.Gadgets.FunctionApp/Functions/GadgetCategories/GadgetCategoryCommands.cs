@@ -4,6 +4,7 @@ using CT.Gadgets.FunctionApp.Extensions;
 using CT.Gadgets.FunctionApp.Helpers.OpenApiParameterAttributes;
 using CT.Gadgets.FunctionApp.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
@@ -29,6 +30,7 @@ public class GadgetCategoryCommands(ILogger<GadgetCategoryCommands> log, IMediat
     [EnableCors]
     [Function($"{Tag}-delete")]
     [OpenApiOperation(operationId: $"{Tag}-delete", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<DeleteGadgetCategoryResponseModel>))]
@@ -51,6 +53,7 @@ public class GadgetCategoryCommands(ILogger<GadgetCategoryCommands> log, IMediat
     [EnableCors]
     [Function($"{Tag}-create")]
     [OpenApiOperation(operationId: $"{Tag}-create", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [OpenApiRequestBodyType(typeof(CreateGadgetCategoryRequestModel), true)]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<UpsertGadgetCategoryResponseModel>))]
@@ -74,6 +77,7 @@ public class GadgetCategoryCommands(ILogger<GadgetCategoryCommands> log, IMediat
     [EnableCors]
     [Function($"{Tag}-update")]
     [OpenApiOperation(operationId: $"{Tag}-update", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OpenApiRequestBodyType(typeof(CreateGadgetCategoryRequestModel), true)]

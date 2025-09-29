@@ -4,6 +4,7 @@ using CT.Gadgets.FunctionApp.Extensions;
 using CT.Gadgets.FunctionApp.Helpers.OpenApiParameterAttributes;
 using CT.Gadgets.FunctionApp.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ public class CategoryCommands(ILogger<CategoryCommands> log, IMediator mediator,
     [EnableCors]
     [Function($"{Tag}-delete")]
     [OpenApiOperation(operationId: $"{Tag}-delete", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<DeleteCategoryResponseModel>))]
@@ -50,6 +52,7 @@ public class CategoryCommands(ILogger<CategoryCommands> log, IMediator mediator,
     [EnableCors]
     [Function($"{Tag}-create")]
     [OpenApiOperation(operationId: $"{Tag}-create", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [OpenApiRequestBodyType(typeof(CreateCategoryRequestModel), true)]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<UpsertCategoryResponseModel>))]
@@ -73,6 +76,7 @@ public class CategoryCommands(ILogger<CategoryCommands> log, IMediator mediator,
     [EnableCors]
     [Function($"{Tag}-update")]
     [OpenApiOperation(operationId: $"{Tag}-update", tags: [Tag])]
+    [Authorize]
     [BearerTokenOpenApiSecurity]
     [IdOpenApiParameter]
     [OpenApiRequestBodyType(typeof(CreateCategoryRequestModel), true)]

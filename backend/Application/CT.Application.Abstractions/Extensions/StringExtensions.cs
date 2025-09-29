@@ -21,4 +21,13 @@ public static class StringExtensions
 
         return DateOnly.Parse(str);
     }
+
+    public static int? ToInt(this string str)
+    {
+        if (str == null)
+        {
+            return null;
+        }
+        return int.Parse(str);
+    }
 }

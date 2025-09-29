@@ -34,8 +34,9 @@ Generate migrations using sql server dbcontext design time options.
 Api routes follow REST principles. Using the swagger interface is straightforward.
 
 # Solution Structure
-This is an example of CQRS (Command Query Responsibility Segregation) solution.
+This is an example of Clean Architecture CQRS (Command Query Responsibility Segregation) solution.
 Thin clients (AzureFunction API project, Test project) call the main Application logic using the MediatR pattern.
+Main business logic is modular and testabile.
 
 # Solution Projects
 
@@ -68,7 +69,7 @@ They contain tests for scenarios described in the project documentation.
 Examples of typical scenarios for various standard operations.
 
 ## Transactional insert
-Class: CreateGadgetCommandHandler
+Class: CreateGadgetFullCommandHandler
 Scenarion: Objects for insert are prepared, transaction is opened in read commited isolation level. 
 Data is inserted, table by table. If any operation fails, everything is rolled back.
 
@@ -97,6 +98,7 @@ Example: [{"fieldName":"name","filter":[{"op":"startsWith","value":"value"}]}]
 
 # Best Practices
     * Clean architecture: CQRS solution design pattern is used. Easily testabile business logic, multiple clients are supported (function app or in the future a standard api, or a console app, etc). *
+    * Authentication: JWT. Short lived access tokens are returned in the response so the frontend can store them in memory. Long lived refresh tokens are return as HttpOnly cookies.*
     * Thin clients: It is easy to migrate the entire app to another platform. Azure functions can be replaced by windows services if situation dictates. All logic is placed inside the Application project. *
     * Project: abstractions separated from implementations. Rule, abstraction projects don't have any project dependencies *
     * Swagger documentation: all parameters are clearly visible in the swagger UI page. Authentication parameter is also shown, but is not used in the solution. *

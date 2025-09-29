@@ -54,8 +54,8 @@ public class AuthenticationCommands(ILogger<AuthenticationCommands> log, IMediat
 
         if (response is HttpResponseData httpResponse)
         {
-            httpResponse.Headers.Add("Set-Cookie",
-                $"refreshToken={refreshToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800");
+            httpResponse.SetRefreshTokenCookie(refreshToken);
+
             return httpResponse;
         }
 

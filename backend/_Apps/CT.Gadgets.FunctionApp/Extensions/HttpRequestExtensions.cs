@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Functions.Worker.Http;
+﻿using Microsoft.Azure.Functions.Worker.Http;
 using Newtonsoft.Json;
 using System.Globalization;
-using System.Net;
 using System.Web;
 
 namespace CT.Gadgets.FunctionApp.Extensions;

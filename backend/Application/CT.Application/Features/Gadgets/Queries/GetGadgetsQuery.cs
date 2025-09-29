@@ -3,6 +3,7 @@ using CT.Application.Abstractions.Extensions;
 using CT.Application.Abstractions.Models;
 using CT.Application.Abstractions.QueryParameters;
 using CT.Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace CT.Application.Features.Gadgets.Queries;
 
@@ -46,6 +47,8 @@ public class GetGadgetsQueryHandler(IGadgetsRepositoryService repository) : IReq
     {
         var query = GetQuery(request.FilterParameters, request.SortParameters);
 
+        var queryStr = query.ToQueryString();
+
         cancellationToken.ThrowIfCancellationRequested();
 
         var data = await _repository.QueryAsync(query, pageIndex: request.PagingParameters?.PageIndex ?? 0, pageSize: request.PagingParameters?.PageSize ?? -1)
@@ -73,8 +76,8 @@ public class GetGadgetsQueryHandler(IGadgetsRepositoryService repository) : IReq
         var updatedAt = parUpdatedAt?.GetFilterQueryParameterDeconstructed((value) => ((string?)value)?.ToDateOnly().ToDateTimeOffset());
 
         var parStockQuantity = filterParameters?.FirstOrDefault(x => x.FieldName.Equals("stockQuantity", StringComparison.CurrentCultureIgnoreCase));
-        var stockQuantity = parStockQuantity?.GetFilterQueryParameterDeconstructed((value) => (int?)value);
-
+        var stockQuantity = parStockQuantity?.GetFilterQueryParameterDeconstructed((value) => ((string?)value)?.ToInt());
+        
         var ctx = _repository.DbContext;
 
         var query =
@@ -90,11 +93,11 @@ public class GetGadgetsQueryHandler(IGadgetsRepositoryService repository) : IReq
                 (name == null || name.StartsWith == null || g.Name.StartsWith(name.StartsWith)) &&
                 (name == null || name.Contains == null || g.Name.Contains(name.Contains)) &&
 
-                (stockQuantity == null || stockQuantity.Eq == null || g.StockQuantity.CompareTo(stockQuantity.Eq) == 0) &&
-                (stockQuantity == null || stockQuantity.Gt == null || g.StockQuantity.CompareTo(stockQuantity.Gt) > 0) &&
-                (stockQuantity == null || stockQuantity.Lt == null || g.StockQuantity.CompareTo(stockQuantity.Lt) < 0) &&
-                (stockQuantity == null || stockQuantity.Gte == null || g.StockQuantity.CompareTo(stockQuantity.Gte) >= 0) &&
-                (stockQuantity == null || stockQuantity.Lte == null || g.StockQuantity.CompareTo(stockQuantity.Lte) >= 0) &&
+                (stockQuantity == null || stockQuantity.Eq == null || g.StockQuantity.CompareTo(stockQuantity.Eq.Value) == 0) &&
+                (stockQuantity == null || stockQuantity.Gt == null || g.StockQuantity.CompareTo(stockQuantity.Gt.Value) > 0) &&
+                (stockQuantity == null || stockQuantity.Lt == null || g.StockQuantity.CompareTo(stockQuantity.Lt.Value) < 0) &&
+                (stockQuantity == null || stockQuantity.Gte == null || g.StockQuantity.CompareTo(stockQuantity.Gte.Value) >= 0) &&
+                (stockQuantity == null || stockQuantity.Lte == null || g.StockQuantity.CompareTo(stockQuantity.Lte.Value) >= 0) &&
 
                 (lastModifiedByUserDisplayName == null || lastModifiedByUserDisplayName.Eq == null || Equals(lastModifiedByUserDisplayName.Eq, u.DisplayName)) &&
                 (lastModifiedByUserDisplayName == null || lastModifiedByUserDisplayName.Gt == null || u.DisplayName.CompareTo(lastModifiedByUserDisplayName.Gt) > 0) &&
