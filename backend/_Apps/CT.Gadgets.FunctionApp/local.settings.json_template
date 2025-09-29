@@ -1,0 +1,16 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DOTNET_ENVIRONMENT": "dev"
+  },
+  "ConnectionStrings": {
+    "Gadgets": "Server=localhost;Initial Catalog=gadgets-dev;Connection Timeout=30;Integrated Security=True;Encrypt=False;"
+  },
+  "Host": {
+    "CORS": "http://localhost:4200",
+    "CORSCredentials": true
+  }
+
+}

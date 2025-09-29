@@ -1,0 +1,13 @@
+table {
+  width: 100%;
+}
+
+.updated {
+  animation: highlight 1s ease;
+  background-color: #c8e6c9;
+}
+
+@keyframes highlight {
+  0% { background-color: #c8e6c9; }
+  100% { background-color: transparent; }
+}

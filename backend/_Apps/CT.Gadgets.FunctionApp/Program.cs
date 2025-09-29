@@ -48,6 +48,7 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
+
 builder.Build().Run();
 
 public class OpenApiConfig : DefaultOpenApiConfigurationOptions

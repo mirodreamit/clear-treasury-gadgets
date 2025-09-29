@@ -71,7 +71,7 @@ public class AuthenticationQueries(ILogger<AuthenticationQueries> log, IMediator
     [BearerTokenOpenApiSecurity]
     [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<RefreshLoginQueryResponseModel>))]
     public async Task<HttpResponseData> RefreshLogin(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = $"{Version}/{Tag}/refresh")] HttpRequestData req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{Version}/{Tag}/refresh")] HttpRequestData req,
         CancellationToken cancellationToken)
     {
         string refreshToken = null!;

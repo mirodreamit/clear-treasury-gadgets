@@ -20,13 +20,12 @@ namespace Ct.Gadgets.SignalR.Host
             builder.Services.AddSwaggerGen();
 
             //string allowedOrigin = "http://localhost:7230";
-            string allowedOrigin = "http://172.18.160.1:8080";
-
+            
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin", policy =>
                 {
-                    policy.WithOrigins(allowedOrigin) // must be exact origin
+                    policy.WithOrigins("http://172.18.160.1:8080", "http://localhost:4200") // must be exact origin
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials(); // SignalR requires credentials for WebSockets
