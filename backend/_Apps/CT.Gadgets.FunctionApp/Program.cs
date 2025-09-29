@@ -1,8 +1,11 @@
-using Microsoft.Azure.Functions.Worker.Builder;
-using Microsoft.Azure.Functions.Worker;
 using CT.Application.Configuration;
 using CT.Application.Extensions;
+using CT.Gadgets.FunctionApp;
 using CT.Gadgets.FunctionApp.Extensions;
+using CT.Gadgets.FunctionApp.Middlewares;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Configurations;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using CT.Gadgets.FunctionApp.Middlewares;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -25,13 +27,21 @@ builder.Services.Configure<ApplicationConfiguration>(
 builder.Services.AddSingleton(sp =>
     sp.GetRequiredService<IOptions<ApplicationConfiguration>>().Value);
 
+builder.Services.Configure<GadgetsHubConfiguration>(
+    builder.Configuration.GetSection("GadgetsHubConfiguration"));
+builder.Services.AddSingleton(sp =>
+    sp.GetRequiredService<IOptions<GadgetsHubConfiguration>>().Value);
+
+var gadgetsHubConfig = builder.Services.BuildServiceProvider()
+    .GetRequiredService<GadgetsHubConfiguration>();
+builder.Services.AddFunctionApp(gadgetsHubConfig.BaseUrl);
+
 var dbConnectionString = builder.Configuration.GetConnectionString("Gadgets")!;
 
 builder.ConfigureFunctionsWebApplication();
 
 builder.UseMiddleware<HttpContextMiddleware>();
 
-builder.Services.AddFunctionApp();
 builder.Services.AddApplication(dbConnectionString);
 
 builder.Services
@@ -39,7 +49,6 @@ builder.Services
     .ConfigureFunctionsApplicationInsights();
 
 builder.Build().Run();
-
 
 public class OpenApiConfig : DefaultOpenApiConfigurationOptions
 {

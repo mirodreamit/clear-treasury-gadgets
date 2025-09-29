@@ -1,14 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CT.Application.Abstractions.Interfaces;
+using CT.Application.Configuration;
+using CT.Application.Extensions;
+using CT.Application.Interfaces;
+using CT.Application.Models;
+using CT.Tests.Configuration;
+using CT.Tests.Services;
+using CT.Tests.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using CT.Application.Abstractions.Interfaces;
-using CT.Application.Configuration;
-using CT.Application.Extensions;
-using CT.Application.Models;
-using CT.Tests.Configuration;
 using TestHelper = CT.Tests.Configuration.Helpers;
-using CT.Tests.Services;
 
 namespace CT.Tests.Extensions;
 
@@ -32,6 +34,7 @@ public static class ServiceCollectionExtensions
         
         services.AddApplication(testProjectConfig.CnnStr);
         services.AddSingleton<IUserContextAccessor, UserContextAccessor>();
+        services.AddSingleton<IGadgetNotifier, GadgetNotifier>();
 
         var sp = services.BuildServiceProvider();
         

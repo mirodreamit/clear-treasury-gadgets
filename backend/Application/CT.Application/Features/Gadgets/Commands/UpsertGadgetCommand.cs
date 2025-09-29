@@ -39,12 +39,14 @@ public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) :
         public UpsertGadgetCommandModelValidator()
         {
             RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.StockQuantity).GreaterThanOrEqualTo(0);
         }
     }
     
-    public class UpsertGadgetCommandHandler(IGadgetsRepositoryService repository) : IRequestHandler<UpsertGadgetCommand, BaseOutput<UpsertGadgetResponseModel>>
+    public class UpsertGadgetCommandHandler(IGadgetsRepositoryService repository, IGadgetNotifier gadgetNotifier) : IRequestHandler<UpsertGadgetCommand, BaseOutput<UpsertGadgetResponseModel>>
     {
         private readonly IGadgetsRepositoryService _repository = repository;
+        private readonly IGadgetNotifier _gadgetNotifier = gadgetNotifier;
 
         public async Task<BaseOutput<UpsertGadgetResponseModel>> Handle(UpsertGadgetCommand request, CancellationToken cancellationToken)
         {
@@ -58,6 +60,8 @@ public class UpsertGadgetCommand(Guid gadgetId, CreateGadgetRequestModel data) :
             var entity = new Gadget(request.GadgetId, request.Model.Name, request.Model.StockQuantity, request.Model.Description, (Guid)request.Context[Constants.ContextKeys.UserId]!);
 
             var res = await _repository.UpsertAsync(entity).ConfigureAwait(false);
+            
+            await _gadgetNotifier.NotifyStockChangeAsync(request.GadgetId.ToString(), request.Model.StockQuantity).ConfigureAwait(false);
 
             return new BaseOutput<UpsertGadgetResponseModel>(res.ToOperationResult(), new UpsertGadgetResponseModel()
             {

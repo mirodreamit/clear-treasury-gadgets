@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gadget Stock Monitor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.7/signalr.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Gadget Stock Monitor</h2>
+    <label for="stockQuantity">Current Stock:</label>
+    <input type="text" id="stockQuantity" readonly />
+
+    <script>
+        // Replace with your SignalR hub URL
+        const hubUrl = "http://localhost:5132/gadgethub";
+
+        // Create connection
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(hubUrl)
+            .withAutomaticReconnect()
+            .build();
+
+        // Subscribe to stock updates
+        connection.on("StockQuantityUpdated", (gadgetId, quantity) => {
+        // if (gadgetId === "your-current-gadget-id") { // optional, if you want to filter
+        document.getElementById("stockQuantity").value = quantity;
+            // }
+        });
+
+        // Start connection
+        async function start() {
+            try {
+                await connection.start();
+                console.log("Connected to GadgetHub.");
+            } catch (err) {
+                console.error(err);
+                setTimeout(start, 5000); // retry after 5s
+            }
+        }
+
+        start();
+    </script>
+</body>
+</html>

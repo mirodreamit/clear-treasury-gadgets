@@ -48,6 +48,7 @@ public class CreateGadgetFullCommand(Guid gadgetId, CreateGadgetFullRequestModel
         public CreateGadgetFullCommandModelValidator()
         {
             RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.StockQuantity).GreaterThanOrEqualTo(0);
             RuleFor(x => x.Categories).NotEmpty();
             RuleForEach(x => x.Categories)
                 .SetValidator(new CategoryRequestModelValidator());

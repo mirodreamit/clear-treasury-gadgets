@@ -1,0 +1,6 @@
+@Ct.Gadgets.SignalR.Host_HostAddress = http://localhost:5132
+
+GET {{Ct.Gadgets.SignalR.Host_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -25,10 +25,11 @@ Generate migrations using sql server dbcontext design time options.
     Update the database.
     Seed data (run Seed.sql from the MS Sql Management Studio).
     Right click on solution and click rebuild (this ensures that post build events of plugins are executed simulating manual plugin deploy).
-    Set the startup project to CT.FunctionApp inside the _Apps solution folder.
+    Set multiple startup projects to CT.Gadgets..FunctionApp and CT.Gadgets.SignalR.Host inside the _Apps solution folder.
     Run the solution.
     Search for swagger UI url in the Console (probably last url displayed).
     Ctrl Click the swagger UI.
+    You have two swagger UIs displayed, one for the function API and other for the SignalR host.
 
 # Swagger UI
 Api routes follow REST principles. Using the swagger interface is straightforward.
@@ -95,6 +96,12 @@ Url parameter:
 [QueryOpenApiParameter("filter", "[{\"fieldName\":\"fieldName\",\"filter\":[{\"op\":\"gt|lt|gte|lte|eq|startsWith|contains\",\"value\":\"some_value\"}]}]", false, typeof(string))]
 Example: [{"fieldName":"name","filter":[{"op":"startsWith","value":"value"}]}]
 * it is possible to filter by more than one field, logical AND is applied
+
+# How to test SignalR hub
+Open visual studio code in the folder CT.Gadgets.SignalR.Host
+In the terminal run http-server, open the server url and go to page /testsignalr.html.
+Using the swagger UI Increase the stock quantity of any gadget.
+TestSignalR.html page updates the quantity.
 
 # Best Practices
     * Clean architecture: CQRS solution design pattern is used. Easily testabile business logic, multiple clients are supported (function app or in the future a standard api, or a console app, etc). *

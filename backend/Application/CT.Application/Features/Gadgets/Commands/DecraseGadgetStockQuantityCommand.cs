@@ -25,10 +25,10 @@ public class DecreaseGadgetStockQuantityCommand(Guid gadgetId) : ContextualReque
         }
     }
 
-    public class DecreaseGadgetStockQuantityCommandHandler(IGadgetsRepositoryService repository) : IRequestHandler<DecreaseGadgetStockQuantityCommand, BaseOutput<DecreaseGadgetStockQuantityResponseModel>>
+    public class DecreaseGadgetStockQuantityCommandHandler(IGadgetsRepositoryService repository, IGadgetNotifier gadgetNotifier) : IRequestHandler<DecreaseGadgetStockQuantityCommand, BaseOutput<DecreaseGadgetStockQuantityResponseModel>>
     {
         private readonly IGadgetsRepositoryService _repository = repository;
-
+        private readonly IGadgetNotifier _gadgetNotifier = gadgetNotifier;
         public async Task<BaseOutput<DecreaseGadgetStockQuantityResponseModel>> Handle(
             DecreaseGadgetStockQuantityCommand request,
             CancellationToken cancellationToken)
@@ -47,6 +47,8 @@ public class DecreaseGadgetStockQuantityCommand(Guid gadgetId) : ContextualReque
                     OperationResult.BadRequest,
                     responseModel);
             }
+
+            await _gadgetNotifier.NotifyStockChangeAsync(request.GadgetId.ToString(), result.StockQuantity).ConfigureAwait(false);
 
             return new BaseOutput<DecreaseGadgetStockQuantityResponseModel>(
                 OperationResult.Updated,

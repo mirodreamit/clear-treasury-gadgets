@@ -11,7 +11,6 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
 using static CT.Application.Features.Authentication.Queries.BasicLoginUserQuery;
 using static CT.Application.Features.Authentication.Queries.RefreshLoginQuery;
-using CT.Gadgets.FunctionApp.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CT.Gadgets.FunctionApp.Functions.Authentication;

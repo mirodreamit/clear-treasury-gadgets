@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CT.Repository.IS", "Reposit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CT.Gadgets.FunctionApp", "_Apps\CT.Gadgets.FunctionApp\CT.Gadgets.FunctionApp.csproj", "{5C3E7268-EC39-4E5D-8030-9FA8F11530BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CT.Gadgets.SignalR.Host", "_Apps\Ct.Gadgets.SignalR.Host\CT.Gadgets.SignalR.Host.csproj", "{F55CE8C6-64D7-42E6-A9D7-253CCC913FCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{5C3E7268-EC39-4E5D-8030-9FA8F11530BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C3E7268-EC39-4E5D-8030-9FA8F11530BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C3E7268-EC39-4E5D-8030-9FA8F11530BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F55CE8C6-64D7-42E6-A9D7-253CCC913FCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F55CE8C6-64D7-42E6-A9D7-253CCC913FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F55CE8C6-64D7-42E6-A9D7-253CCC913FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F55CE8C6-64D7-42E6-A9D7-253CCC913FCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{F70F3FA1-2D50-405C-86B0-EA26B74A73EB} = {035C74F6-2EFB-44C1-9438-C93C7233159E}
 		{697E49EC-5227-4B2D-8681-F8FAA51E8718} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5C3E7268-EC39-4E5D-8030-9FA8F11530BC} = {2E1945CA-C43A-471E-9DDC-C9DDF15B450D}
+		{F55CE8C6-64D7-42E6-A9D7-253CCC913FCD} = {2E1945CA-C43A-471E-9DDC-C9DDF15B450D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5858EA68-EEE3-4441-9269-51DEEFFFCA05}
