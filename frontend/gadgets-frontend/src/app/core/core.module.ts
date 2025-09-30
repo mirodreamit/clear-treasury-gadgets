@@ -1,16 +1,22 @@
-import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from './auth.interceptor';
+// core.module.ts
+import { NgModule, Optional, SkipSelf, ModuleWithProviders } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './auth.interceptor';
 
-@NgModule({
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
-  ]
-})
+@NgModule({})
 export class CoreModule {
   constructor(@Optional() @SkipSelf() parentModule: CoreModule) {
     if (parentModule) {
-      throw new Error('CoreModule is already loaded. Import only in AppModule.');
+      throw new Error('CoreModule is already loaded. Import only once.');
     }
+  }
+
+  static forRoot(): ModuleWithProviders<CoreModule> {
+    return {
+      ngModule: CoreModule,
+      providers: [
+        provideHttpClient(withInterceptors([authInterceptor]))
+      ]
+    };
   }
 }

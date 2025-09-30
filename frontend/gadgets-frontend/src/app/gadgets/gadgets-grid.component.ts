@@ -1,0 +1,89 @@
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { BaseGridComponent, ColumnDef } from '../core/basegrid.component';
+import { GadgetsService } from '../api/api/gadgets.service';
+import { SignalRService, StockUpdate } from '../core/signalr.service';
+import { GetGadgetsQueryResponseModel } from '../api/model/getGadgetsQueryResponseModel';
+
+// UI-facing model (camelCase)
+export interface Gadget {
+  id: string;
+  name: string;
+  stockQuantity: number;
+  lastModifiedByUserDisplayName: string;
+  updatedAt: string;
+  selected: boolean;
+}
+
+@Component({
+  selector: 'app-gadgets-grid',
+  standalone: true,
+  imports: [CommonModule, BaseGridComponent],
+  template: `
+    <app-base-grid
+      [columns]="columns"
+      [dataSource]="dataSource"
+      [increment]="increment"
+      [decrement]="decrement">
+    </app-base-grid>
+  `,
+  styleUrls: ['./gadgets-grid.component.scss']
+})
+export class GadgetsGridComponent implements OnInit {
+  dataSource = signal<Gadget[]>([]);
+  previousStock: Record<string, number> = {};
+
+  columns: ColumnDef<Gadget>[] = [
+    { field: 'selected', header: '', type: 'checkbox' },
+    { field: 'name', header: 'Name' },
+    { field: 'stockQuantity', header: 'Stock Quantity' },
+    { field: 'lastModifiedByUserDisplayName', header: 'Last Modified By' },
+    { field: 'updatedAt', header: 'Updated At' },
+    { field: 'actions', header: 'Actions', type: 'actions' }
+  ] as any; // actions isn't a real field, but safe with 'as any'
+
+  constructor(
+    private signalR: SignalRService,
+    private gadgetsService: GadgetsService
+  ) {}
+
+  ngOnInit() {
+    this.loadGadgets();
+
+    this.signalR.stockUpdates$.subscribe((update: StockUpdate | null) => {
+      if (!update) return;
+      const data = [...this.dataSource()];
+      const idx = data.findIndex(g => g.id === update.gadgetId);
+      if (idx !== -1) {
+        this.previousStock[data[idx].id] = data[idx].stockQuantity;
+        data[idx] = { ...data[idx], stockQuantity: update.stockQuantity };
+        this.dataSource.set(data);
+      }
+    });
+  }
+
+  loadGadgets() {
+    this.gadgetsService.gadgetsGet().subscribe(res => {
+      const gadgets: Gadget[] = ((res as any).Model as GetGadgetsQueryResponseModel[])?.map((g: GetGadgetsQueryResponseModel) => ({
+        id: g.Id ?? '',
+        name: g.Name ?? '',
+        stockQuantity: g.StockQuantity ?? 0,
+        lastModifiedByUserDisplayName: g.LastModifiedByUserDisplayName ?? '',
+        updatedAt: g.UpdatedAt ?? '',
+        selected: false
+      })) ?? [];
+
+
+      gadgets.forEach(g => this.previousStock[g.id] = g.stockQuantity);
+      this.dataSource.set(gadgets);
+    });
+  }
+
+  increment = (g: Gadget) => {
+    this.gadgetsService.gadgetsIncreaseStockByOne(g.id).subscribe();
+  };
+
+  decrement = (g: Gadget) => {
+    this.gadgetsService.gadgetsDecreaseStockByOne(g.id).subscribe();
+  };
+}

@@ -69,8 +69,8 @@ public class RequestAuthenticationBehaviour<TRequest, TResponse>(IUserContextAcc
             {
                 return (TResponse)ctor.Invoke(
                 [
-                    OperationResult.InternalError,
-                    HttpStatusCode.InternalServerError.ToString(),
+                    OperationResult.Unauthorized,
+                    HttpStatusCode.Unauthorized.ToString(),
                     new ApplicationError(new {
                         TokenExpired = true,
                         ErrorMessage = errorMessage

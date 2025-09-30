@@ -12,6 +12,7 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
 using static CT.Application.Features.Gadgets.Commands.CreateGadgetFullCommand;
 using static CT.Application.Features.Gadgets.Commands.DeleteGadgetCommand;
+using static CT.Application.Features.Gadgets.Commands.DeleteGadgetFullBatchCommand;
 using static CT.Application.Features.Gadgets.Commands.DeleteGadgetFullCommand;
 using static CT.Application.Features.Gadgets.Commands.UpsertGadgetCommand;
 
@@ -26,7 +27,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
     private const string Version = "v1";
     private const string Tag = "gadgets";
 
-    #pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable IDE0060 // Remove unused parameter
     [EnableCors]
     [Function($"{Tag}-delete")]
     [OpenApiOperation(operationId: $"{Tag}-delete", tags: [Tag])]
@@ -50,7 +51,7 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
         return response;
     }
 
-    #pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable IDE0060 // Remove unused parameter
     [EnableCors]
     [Function($"{Tag}-delete-full")]
     [OpenApiOperation(operationId: $"{Tag}-delete-full", tags: [Tag])]
@@ -69,6 +70,32 @@ public class GadgetCommands(ILogger<GadgetCommands> log, IMediator mediator, IHt
             await _httpRequestProcessingService.ProcessHttpRequestAsync(req, async () =>
                 await _mediator.Send(cmd, cancellationToken).ConfigureAwait(false),
                 _logger)
+            .ConfigureAwait(false);
+
+        return response;
+    }
+
+#pragma warning disable IDE0060 // Remove unused parameter
+    [EnableCors]
+    [Function($"{Tag}-batch-delete-full")]
+    [OpenApiOperation(operationId: $"{Tag}-batch-delete-full", tags: [Tag])]
+    [Authorize]
+    [BearerTokenOpenApiSecurity]
+    [OpenApiRequestBodyType(typeof(DeleteGadgetFullBatchRequestModel), true)]
+    [OkJsonOpenApiResponseWithBody(typeof(BaseOutput<DeleteGadgetFullBatchResponseModel>))]
+    public async Task<HttpResponseData> DeleteFullBatch(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{Version}/{Tag}/batch-delete-full")] HttpRequestData req,
+        CancellationToken cancellationToken)
+    {
+        var response =
+            await _httpRequestProcessingService.ProcessHttpRequestAsync(req, async () =>
+            {
+                var model = await req.GetModelFromRequestBodyAsync<DeleteGadgetFullBatchRequestModel>();
+                
+                var cmd = new DeleteGadgetFullBatchCommand(model);
+
+                return await _mediator.Send(cmd, cancellationToken).ConfigureAwait(false);
+            }, _logger)
             .ConfigureAwait(false);
 
         return response;

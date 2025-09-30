@@ -10,11 +10,11 @@
 
 
 export interface GetGadgetsQueryResponseModel { 
-    id?: string;
-    name?: string;
-    stockQuantity?: number;
-    lastModifiedByUserDisplayName?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    Id?: string;
+    Name?: string;
+    StockQuantity?: number;
+    LastModifiedByUserDisplayName?: string;
+    CreatedAt?: string;
+    UpdatedAt?: string;
 }
 

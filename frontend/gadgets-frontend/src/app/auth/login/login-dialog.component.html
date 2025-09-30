@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Login / Signup</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="onLogin()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" formControlName="password" required />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onSignup()">Signup</button>
+  <button mat-flat-button color="primary" (click)="onLogin()">Login</button>
+</mat-dialog-actions>

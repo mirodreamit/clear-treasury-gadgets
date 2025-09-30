@@ -5,26 +5,31 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
+interface AuthResponse {
+  Model: {
+    Token: string;
+    RefreshToken: string;
+    DisplayName?: string; // optional, depends on backend
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private accessToken: string | null = null;
+  private _displayName: string | null = null;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  logout(): void {
-    this.accessToken = null;
-    localStorage.removeItem('refreshToken');
-    this.router.navigate(['/login']);
-  }
-
-  isLoggedIn(): boolean {
-    return !!this.accessToken;
+  // --- Accessors ---
+  get displayName(): string | null {
+    return this._displayName;
   }
 
   getAccessToken(): string | null {
     return this.accessToken;
   }
 
+  // --- Token management ---
   setAccessToken(token: string) {
     this.accessToken = token;
   }
@@ -37,35 +42,39 @@ export class AuthService {
     localStorage.setItem('refreshToken', token);
   }
 
-  // Login - store access token in memory, refresh token in localStorage
+  // --- Auth state ---
+  isLoggedIn(): boolean {
+    return !!this.accessToken;
+  }
+
+  logout(): void {
+    this.accessToken = null;
+    this._displayName = null;
+    localStorage.removeItem('refreshToken');
+    this.router.navigate(['/login']);
+  }
+
+  // --- API calls ---
   login(email: string, password: string): Observable<string> {
-    return this.http.post<{ Model: { Token: string; RefreshToken: string } }>(
+    return this.http.post<AuthResponse>(
       `${environment.apiBaseUrl}/auth/login`,
       { email, password }
     ).pipe(
-      tap(res => {
-        this.accessToken = res.Model.Token;           // in-memory
-        this.setRefreshToken(res.Model.RefreshToken); // localStorage
-      }),
+      tap(res => this.handleAuthResponse(res, email)),
       map(res => res.Model.Token)
     );
   }
 
-  // Signup - same pattern
   signup(email: string, password: string): Observable<string> {
-    return this.http.post<{ Model: { Token: string; RefreshToken: string } }>(
+    return this.http.post<AuthResponse>(
       `${environment.apiBaseUrl}/auth/signup`,
       { email, password }
     ).pipe(
-      tap(res => {
-        this.accessToken = res.Model.Token;
-        this.setRefreshToken(res.Model.RefreshToken);
-      }),
+      tap(res => this.handleAuthResponse(res, email)),
       map(res => res.Model.Token)
     );
   }
 
-  // Refresh - read refresh token from localStorage, send in Authorization header
   refreshToken(): Observable<string> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) throw new Error('No refresh token available');
@@ -74,13 +83,20 @@ export class AuthService {
       Authorization: `Bearer ${refreshToken}`
     });
 
-    return this.http.post<{ Model: { Token: string } }>(
+    return this.http.post<AuthResponse>(
       `${environment.apiBaseUrl}/auth/refresh`,
       {},
       { headers }
     ).pipe(
-      tap(res => this.accessToken = res.Model.Token), // store in memory
+      tap(res => this.handleAuthResponse(res)),
       map(res => res.Model.Token)
     );
+  }
+
+  // --- Helper to DRY up token handling ---
+  private handleAuthResponse(res: AuthResponse, fallbackEmail?: string): void {
+    this.accessToken = res.Model.Token;
+    this.setRefreshToken(res.Model.RefreshToken);
+    this._displayName = res.Model.DisplayName ?? fallbackEmail ?? null;
   }
 }

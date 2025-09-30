@@ -21,6 +21,7 @@ public class UpsertCategoryCommand(Guid id, CreateCategoryRequestModel data) : B
     public class UpsertCategoryResponseModel
     {
         public Guid CategoryId { get; set; }
+        public string Name { get; set; }
     }
 
     public class UpsertCategoryCommandValidator : AbstractValidator<UpsertCategoryCommand>
@@ -61,7 +62,8 @@ public class UpsertCategoryCommand(Guid id, CreateCategoryRequestModel data) : B
 
             return new BaseOutput<UpsertCategoryResponseModel>(res.ToOperationResult(), new UpsertCategoryResponseModel()
             {
-                CategoryId = entity.Id
+                CategoryId = entity.Id,
+                Name = entity.Name
             });
         }
     }
