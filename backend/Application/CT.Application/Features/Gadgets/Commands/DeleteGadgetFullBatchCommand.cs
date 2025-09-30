@@ -6,7 +6,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 using static CT.Application.Features.Gadgets.Commands.DeleteGadgetFullBatchCommand;
-using static CT.Application.Features.Gadgets.Commands.UpsertGadgetCommand;
 
 namespace CT.Application.Features.Gadgets.Commands;
 

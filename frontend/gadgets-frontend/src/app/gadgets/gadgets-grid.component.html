@@ -1,31 +1,67 @@
+<!-- Delete Selected Button -->
+<div style="margin-bottom: 12px;">
+  <button mat-raised-button color="warn" (click)="deleteSelected()" [disabled]="!hasSelected()">
+    Delete Selected
+  </button>
+</div>
+
 <table mat-table [dataSource]="dataSource()" class="mat-elevation-z8">
 
-  <!-- Name Column -->
+  <!-- Select Checkbox -->
+  <ng-container matColumnDef="selected">
+    <!-- Header: select/unselect all -->
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-checkbox
+        [checked]="dataSource().every(g => g.selected)"
+        [indeterminate]="dataSource().some(g => g.selected) && !dataSource().every(g => g.selected)"
+        (change)="toggleSelectAll($event.checked)">
+      </mat-checkbox>
+    </th>
+
+    <!-- Row -->
+    <td mat-cell *matCellDef="let row">
+      <mat-checkbox
+        [checked]="row.selected"
+        (change)="onSelectChange(row, $event.checked)">
+      </mat-checkbox>
+    </td>
+  </ng-container>
+
+  <!-- Name -->
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let gadget">{{ gadget.name }}</td>
+    <td mat-cell *matCellDef="let row">{{ row.name }}</td>
   </ng-container>
 
-  <!-- Stock Quantity Column -->
+  <!-- Stock Quantity -->
   <ng-container matColumnDef="stockQuantity">
     <th mat-header-cell *matHeaderCellDef>Stock</th>
-    <td mat-cell *matCellDef="let gadget">
-      <span [class.updated]="gadget.stockQuantity !== previousStock[gadget.id]">
-        {{ gadget.stockQuantity }}
-      </span>
-    </td>
+    <td mat-cell *matCellDef="let row">{{ row.stockQuantity }}</td>
   </ng-container>
 
-  <!-- Actions Column -->
+  <!-- Last Modified By -->
+  <ng-container matColumnDef="lastModifiedByUserDisplayName">
+    <th mat-header-cell *matHeaderCellDef>Last Modified By</th>
+    <td mat-cell *matCellDef="let row">{{ row.lastModifiedByUserDisplayName }}</td>
+  </ng-container>
+
+  <!-- Updated At -->
+  <ng-container matColumnDef="updatedAt">
+    <th mat-header-cell *matHeaderCellDef>Updated At</th>
+    <td mat-cell *matCellDef="let row">{{ row.updatedAt }}</td>
+  </ng-container>
+
+  <!-- Actions -->
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
-    <td mat-cell *matCellDef="let gadget">
-      <button mat-button color="primary" (click)="increment(gadget.id)">+</button>
-      <button mat-button color="warn" (click)="decrement(gadget.id)">-</button>
+    <td mat-cell *matCellDef="let row">
+      <button mat-mini-button color="primary" (click)="increment(row)">+</button>
+      <button mat-mini-button color="warn" (click)="decrement(row)">-</button>
     </td>
   </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  <!-- Header and Row Definitions -->
+  <tr mat-header-row *matHeaderRowDef="columns.map(c => c.field)"></tr>
+  <tr mat-row *matRowDef="let row; columns: columns.map(c => c.field)"></tr>
 
 </table>

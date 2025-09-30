@@ -149,7 +149,7 @@ export class AuthService extends BaseService {
 
         let localVarPath = `/v1/auth/refresh`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BaseOutputRefreshLoginQueryResponseModel>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BaseOutputRefreshLoginQueryResponseModel>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

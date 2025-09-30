@@ -11,5 +11,6 @@
 
 export interface UpsertCategoryResponseModel { 
     categoryId?: string;
+    name?: string;
 }
 

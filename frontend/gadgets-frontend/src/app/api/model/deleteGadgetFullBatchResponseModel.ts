@@ -9,12 +9,7 @@
  */
 
 
-export interface GetGadgetsQueryResponseModel { 
-    id?: string;
-    name?: string;
-    stockQuantity?: number;
-    lastModifiedByUserDisplayName?: string;
-    createdAt?: string;
-    updatedAt?: string;
+export interface DeleteGadgetFullBatchResponseModel { 
+    gadgetIds?: Array<string>;
 }
 

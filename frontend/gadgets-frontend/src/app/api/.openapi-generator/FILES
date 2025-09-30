@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 api.base.service.ts
 api.module.ts
@@ -17,6 +16,7 @@ model/baseOutputBasicRegisterUserCommandResponseModel.ts
 model/baseOutputCreateGadgetFullResponseModel.ts
 model/baseOutputDeleteCategoryResponseModel.ts
 model/baseOutputDeleteGadgetCategoryResponseModel.ts
+model/baseOutputDeleteGadgetFullBatchResponseModel.ts
 model/baseOutputDeleteGadgetFullResponseModel.ts
 model/baseOutputDeleteGadgetResponseModel.ts
 model/baseOutputGetCategoryByIdQueryResponseModel.ts
@@ -39,6 +39,8 @@ model/createGadgetFullResponseModel.ts
 model/createGadgetRequestModel.ts
 model/deleteCategoryResponseModel.ts
 model/deleteGadgetCategoryResponseModel.ts
+model/deleteGadgetFullBatchRequestModel.ts
+model/deleteGadgetFullBatchResponseModel.ts
 model/deleteGadgetFullResponseModel.ts
 model/deleteGadgetResponseModel.ts
 model/gadgetCategoryPagingResponseModel.ts

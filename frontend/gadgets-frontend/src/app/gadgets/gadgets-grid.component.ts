@@ -20,13 +20,20 @@ export interface Gadget {
   standalone: true,
   imports: [CommonModule, BaseGridComponent],
   template: `
-    <app-base-grid
-      [columns]="columns"
-      [dataSource]="dataSource"
-      [increment]="increment"
-      [decrement]="decrement">
-    </app-base-grid>
-  `,
+  <!-- Delete Selected Button -->
+  <div style="margin-bottom: 12px;">
+    <button mat-raised-button color="warn" (click)="deleteSelected()" [disabled]="!hasSelected()">
+      Delete Selected
+    </button>
+  </div>
+
+  <app-base-grid
+    [columns]="columns"
+    [dataSource]="dataSource"
+    [increment]="increment"
+    [decrement]="decrement">
+  </app-base-grid>
+`,
   styleUrls: ['./gadgets-grid.component.scss']
 })
 export class GadgetsGridComponent implements OnInit {
@@ -64,14 +71,27 @@ export class GadgetsGridComponent implements OnInit {
 
   loadGadgets() {
     this.gadgetsService.gadgetsGet().subscribe(res => {
-      const gadgets: Gadget[] = ((res as any).Model as GetGadgetsQueryResponseModel[])?.map((g: GetGadgetsQueryResponseModel) => ({
-        id: g.Id ?? '',
-        name: g.Name ?? '',
-        stockQuantity: g.StockQuantity ?? 0,
-        lastModifiedByUserDisplayName: g.LastModifiedByUserDisplayName ?? '',
-        updatedAt: g.UpdatedAt ?? '',
-        selected: false
-      })) ?? [];
+      function toCamelCase<T>(obj: any): T {
+        return Object.fromEntries(
+          Object.entries(obj).map(([key, value]) => [
+            key.charAt(0).toLowerCase() + key.slice(1),
+            value
+          ])
+        ) as T;
+      }
+
+      const gadgets: Gadget[] = ((res as any).Model as GetGadgetsQueryResponseModel[])
+        ?.map(g => {
+          const camel = toCamelCase<GetGadgetsQueryResponseModel>(g);
+          return {
+            id: camel.id ?? '',
+            name: camel.name ?? '',
+            stockQuantity: camel.stockQuantity ?? 0,
+            lastModifiedByUserDisplayName: camel.lastModifiedByUserDisplayName ?? '',
+            updatedAt: camel.updatedAt ?? '',
+            selected: false
+          };
+        }) ?? [];
 
 
       gadgets.forEach(g => this.previousStock[g.id] = g.stockQuantity);
@@ -86,4 +106,35 @@ export class GadgetsGridComponent implements OnInit {
   decrement = (g: Gadget) => {
     this.gadgetsService.gadgetsDecreaseStockByOne(g.id).subscribe();
   };
+
+  onSelectChange(row: Gadget, checked: boolean) {
+    row.selected = checked;
+    this.dataSource.set([...this.dataSource()]); // triggers reactive update
+  }
+
+  toggleSelectAll(checked: boolean) {
+    const data = this.dataSource().map(g => ({ ...g, selected: checked }));
+    this.dataSource.set(data);
+  }
+
+  hasSelected(): boolean {
+    return this.dataSource().some(g => g.selected);
+  }
+
+  deleteSelected() {
+    const selectedIds = this.dataSource()
+      .filter(g => g.selected)
+      .map(g => g.id);
+
+    if (selectedIds.length === 0) return;
+
+    this.gadgetsService.gadgetsBatchDeleteFull({ gadgetIds: selectedIds }).subscribe({
+      next: () => {
+        // Remove deleted gadgets from grid
+        const remaining = this.dataSource().filter(g => !g.selected);
+        this.dataSource.set(remaining);
+      },
+      error: err => console.error('Batch delete failed', err)
+    });
+  }
 }

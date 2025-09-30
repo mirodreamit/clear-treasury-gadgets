@@ -19,6 +19,8 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { BaseOutputCreateGadgetFullResponseModel } from '../model/baseOutputCreateGadgetFullResponseModel';
 // @ts-ignore
+import { BaseOutputDeleteGadgetFullBatchResponseModel } from '../model/baseOutputDeleteGadgetFullBatchResponseModel';
+// @ts-ignore
 import { BaseOutputDeleteGadgetFullResponseModel } from '../model/baseOutputDeleteGadgetFullResponseModel';
 // @ts-ignore
 import { BaseOutputDeleteGadgetResponseModel } from '../model/baseOutputDeleteGadgetResponseModel';
@@ -32,6 +34,8 @@ import { BaseOutputUpsertGadgetResponseModel } from '../model/baseOutputUpsertGa
 import { CreateGadgetFullRequestModel } from '../model/createGadgetFullRequestModel';
 // @ts-ignore
 import { CreateGadgetRequestModel } from '../model/createGadgetRequestModel';
+// @ts-ignore
+import { DeleteGadgetFullBatchRequestModel } from '../model/deleteGadgetFullBatchRequestModel';
 // @ts-ignore
 import { GetEntitiesResponseGetGadgetsQueryResponseModel } from '../model/getEntitiesResponseGetGadgetsQueryResponseModel';
 
@@ -49,6 +53,72 @@ export class GadgetsService extends BaseService {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
+    }
+
+    /**
+     * @param deleteGadgetFullBatchRequestModel Data in json format.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public gadgetsBatchDeleteFull(deleteGadgetFullBatchRequestModel: DeleteGadgetFullBatchRequestModel, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BaseOutputDeleteGadgetFullBatchResponseModel>;
+    public gadgetsBatchDeleteFull(deleteGadgetFullBatchRequestModel: DeleteGadgetFullBatchRequestModel, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BaseOutputDeleteGadgetFullBatchResponseModel>>;
+    public gadgetsBatchDeleteFull(deleteGadgetFullBatchRequestModel: DeleteGadgetFullBatchRequestModel, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BaseOutputDeleteGadgetFullBatchResponseModel>>;
+    public gadgetsBatchDeleteFull(deleteGadgetFullBatchRequestModel: DeleteGadgetFullBatchRequestModel, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (deleteGadgetFullBatchRequestModel === null || deleteGadgetFullBatchRequestModel === undefined) {
+            throw new Error('Required parameter deleteGadgetFullBatchRequestModel was null or undefined when calling gadgetsBatchDeleteFull.');
+        }
+
+        let localVarHeaders = this.defaultHeaders;
+
+        // authentication (Authorization) required
+        localVarHeaders = this.configuration.addCredentialToHeaders('Authorization', 'Authorization', localVarHeaders);
+
+        const localVarHttpHeaderAcceptSelected: string | undefined = options?.httpHeaderAccept ?? this.configuration.selectHeaderAccept([
+            'application/json'
+        ]);
+        if (localVarHttpHeaderAcceptSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Accept', localVarHttpHeaderAcceptSelected);
+        }
+
+        const localVarHttpContext: HttpContext = options?.context ?? new HttpContext();
+
+        const localVarTransferCache: boolean = options?.transferCache ?? true;
+
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+            'application/json'
+        ];
+        const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected !== undefined) {
+            localVarHeaders = localVarHeaders.set('Content-Type', httpContentTypeSelected);
+        }
+
+        let responseType_: 'text' | 'json' | 'blob' = 'json';
+        if (localVarHttpHeaderAcceptSelected) {
+            if (localVarHttpHeaderAcceptSelected.startsWith('text')) {
+                responseType_ = 'text';
+            } else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+                responseType_ = 'json';
+            } else {
+                responseType_ = 'blob';
+            }
+        }
+
+        let localVarPath = `/v1/gadgets/batch-delete-full`;
+        const { basePath, withCredentials } = this.configuration;
+        return this.httpClient.request<BaseOutputDeleteGadgetFullBatchResponseModel>('post', `${basePath}${localVarPath}`,
+            {
+                context: localVarHttpContext,
+                body: deleteGadgetFullBatchRequestModel,
+                responseType: <any>responseType_,
+                ...(withCredentials ? { withCredentials } : {}),
+                headers: localVarHeaders,
+                observe: observe,
+                transferCache: localVarTransferCache,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
