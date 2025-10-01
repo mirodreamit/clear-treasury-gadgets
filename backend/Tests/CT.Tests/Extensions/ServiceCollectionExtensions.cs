@@ -5,7 +5,6 @@ using CT.Application.Interfaces;
 using CT.Application.Models;
 using CT.Tests.Configuration;
 using CT.Tests.Services;
-using CT.Tests.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -1,15 +1,11 @@
 ﻿using CT.Application.Interfaces;
-using Microsoft.AspNetCore.SignalR;
 
-namespace CT.Tests.SignalR;
+namespace CT.Tests.Services;
 
 public class GadgetNotifier: IGadgetNotifier
 {
-    private readonly IHubContext<GadgetHub> _hubContext;
-
-    public GadgetNotifier(IHubContext<GadgetHub> hubContext)
+    public GadgetNotifier()
     {
-        _hubContext = hubContext;
     }
 
     public async Task<bool> NotifyStockChangeAsync(string gadgetId, int newStockQuantity)
