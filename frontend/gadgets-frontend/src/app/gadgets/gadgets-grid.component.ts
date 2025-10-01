@@ -80,7 +80,7 @@ export class GadgetsGridComponent implements OnInit {
         ) as T;
       }
 
-      const gadgets: Gadget[] = ((res as any).Model as GetGadgetsQueryResponseModel[])
+      const gadgets: Gadget[] = (res.model as GetGadgetsQueryResponseModel[])
         ?.map(g => {
           const camel = toCamelCase<GetGadgetsQueryResponseModel>(g);
           return {

@@ -7,6 +7,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System.Net;
 
 namespace CT.Gadgets.FunctionApp.Services;
@@ -15,9 +16,10 @@ public class HttpRequestProcessingService : IHttpRequestProcessingService
 {
     private static readonly JsonSerializerSettings JsonSettings = new()
     {
+        ContractResolver = new CamelCasePropertyNamesContractResolver(),
         Converters = { new StringEnumConverter() },
         NullValueHandling = NullValueHandling.Ignore,
-        Formatting = Formatting.None
+        Formatting = Formatting.Indented
     };
     
     public async Task<HttpResponseData> ProcessHttpRequestAsync( 

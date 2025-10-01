@@ -6,10 +6,10 @@ import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
 interface AuthResponse {
-  Model: {
-    Token: string;
-    RefreshToken: string;
-    DisplayName?: string; // optional, depends on backend
+  model: {
+    token: string;
+    refreshToken: string;
+    displayName?: string; // optional, depends on backend
   };
 }
 
@@ -61,7 +61,7 @@ export class AuthService {
       { email, password }
     ).pipe(
       tap(res => this.handleAuthResponse(res, email)),
-      map(res => res.Model.Token)
+      map(res => res.model.token)
     );
   }
 
@@ -71,7 +71,7 @@ export class AuthService {
       { email, password }
     ).pipe(
       tap(res => this.handleAuthResponse(res, email)),
-      map(res => res.Model.Token)
+      map(res => res.model.token)
     );
   }
 
@@ -89,14 +89,14 @@ export class AuthService {
       { headers }
     ).pipe(
       tap(res => this.handleAuthResponse(res)),
-      map(res => res.Model.Token)
+      map(res => res.model.token)
     );
   }
 
   // --- Helper to DRY up token handling ---
   private handleAuthResponse(res: AuthResponse, fallbackEmail?: string): void {
-    this.accessToken = res.Model.Token;
-    this.setRefreshToken(res.Model.RefreshToken);
-    this._displayName = res.Model.DisplayName ?? fallbackEmail ?? null;
+    this.accessToken = res.model.token;
+    this.setRefreshToken(res.model.refreshToken);
+    this._displayName = res.model.displayName ?? fallbackEmail ?? null;
   }
 }

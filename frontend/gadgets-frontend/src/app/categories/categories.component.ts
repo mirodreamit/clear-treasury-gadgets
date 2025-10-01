@@ -43,11 +43,11 @@ export class CategoriesComponent {
   }
 
   loadCategories() {
-    this.categoriesService.categoriesGet().subscribe((res: GetEntitiesResponseGetCategoriesQueryResponseModel) => {
-        const cats = (res as any).Model ?? []; // map capital M to lowercase model
-        this.categories.set(cats);
-    });
-  }
+  this.categoriesService.categoriesGet().subscribe((res: any) => {
+    const cats = res.model ?? [];
+    this.categories.set(cats);
+  });
+}
 
   submit() {
     const name: string = this.form.value.name!;
