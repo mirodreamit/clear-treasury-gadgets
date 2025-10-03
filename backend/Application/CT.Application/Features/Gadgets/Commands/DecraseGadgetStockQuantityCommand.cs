@@ -45,6 +45,7 @@ public class DecreaseGadgetStockQuantityCommand(Guid gadgetId) : ContextualReque
             {
                 return new BaseOutput<DecreaseGadgetStockQuantityResponseModel>(
                     OperationResult.BadRequest,
+                    result.ErrorMessage,
                     responseModel);
             }
 

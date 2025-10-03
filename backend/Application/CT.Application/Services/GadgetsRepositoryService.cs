@@ -3,6 +3,7 @@ using CT.Repository;
 using CT.Repository.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace CT.Application.Services;
 
@@ -18,13 +19,15 @@ public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<Reposi
         return await ChangeGadgetStockQuantityAsync(gadgetId, userId, 1, cancellationToken).ConfigureAwait(false);
     }
 
-    // Semaphore to lock access - concurrent stock changes
-    private static readonly SemaphoreSlim _semaphore = new(1, 1);
+    private static readonly ConcurrentDictionary<Guid, SemaphoreSlim> _locks = new();
 
     #region private methods
-    private async Task<(bool Success, string? ErrorMessage, int StockQuantity)> ChangeGadgetStockQuantityAsync(Guid gadgetId, Guid userId, int delta, CancellationToken cancellationToken)
+    private async Task<(bool Success, string? ErrorMessage, int StockQuantity)> ChangeGadgetStockQuantityAsync(
+        Guid gadgetId, Guid userId, int delta, CancellationToken cancellationToken)
     {
-        await _semaphore.WaitAsync(cancellationToken);
+        var semaphore = _locks.GetOrAdd(gadgetId, _ => new SemaphoreSlim(1, 1));
+
+        await semaphore.WaitAsync(cancellationToken);
 
         try
         {
@@ -39,7 +42,7 @@ public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<Reposi
             cancellationToken.ThrowIfCancellationRequested();
 
             var newStockQuantity = stockQuantity + delta;
-            
+
             if (newStockQuantity < 0)
             {
                 return (false, "Stock quantity cannot be less than zero.", stockQuantity);
@@ -59,10 +62,8 @@ public class GadgetsRepositoryService(GadgetsDbContext dbContext, ILogger<Reposi
         }
         finally
         {
-            _semaphore.Release();
+            semaphore.Release();
         }
     }
-
-
-    #endregion
+#endregion
 }
